@@ -5,8 +5,8 @@
 #include "primitive.hpp"
 
 #include <cstdint>
-#include <vector>
 #include <iostream>
+#include <vector>
 
 struct Scene {
     std::uint32_t height;
