@@ -6,7 +6,7 @@
 
 namespace io {
 
-Scene load_scene(std::string path);
-void generate_image(std::string path);
+Scene load_scene(const std::string& a_path);
+void generate_image(const std::string& a_path);
 
 } // namespace io

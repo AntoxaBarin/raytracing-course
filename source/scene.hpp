@@ -5,8 +5,8 @@
 #include "primitive.hpp"
 
 #include <cstdint>
-#include <variant>
 #include <vector>
+#include <iostream>
 
 struct Scene {
     std::uint32_t height;
@@ -19,5 +19,7 @@ struct Scene {
     glm::vec3 camera_up;
     glm::vec3 camera_forward;
 
-    std::vector<shape> primitives;
+    std::vector<Shape> primitives;
 };
+
+std::ostream& operator<<(std::ostream& a_out, const Scene& a_scene);

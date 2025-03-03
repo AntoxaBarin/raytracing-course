@@ -10,8 +10,8 @@ enum class PRIMITIVE_TYPE {
     Box
 };
 
-struct shape {
-    shape(PRIMITIVE_TYPE type);
+struct Shape {
+    Shape(PRIMITIVE_TYPE a_type);
 
     glm::vec3 color;
     glm::vec3 position;
@@ -19,20 +19,20 @@ struct shape {
     PRIMITIVE_TYPE type;
 };
 
-struct plane : shape {
-    plane();
+struct Plane : Shape {
+    Plane();
     
     glm::vec3 normal;
 };
 
-struct ellipsoid : shape {
-    ellipsoid();
+struct Ellipsoid : Shape {
+    Ellipsoid();
 
     glm::vec3 radius;
 };
 
-struct box : shape {
-    box();
+struct Box : Shape {
+    Box();
 
     glm::vec3 size; 
 };

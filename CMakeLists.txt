@@ -16,10 +16,12 @@ set(SOURCE
     source/io.cpp 
     source/io.hpp 
     source/scene.hpp 
+    source/scene.cpp
     source/primitive.hpp 
+    source/primitive.cpp
 )
 
-add_executable(${TARGET_NAME} source/main.cpp)
+add_executable(${TARGET_NAME} ${SOURCE})
 
 target_link_libraries(${TARGET_NAME} PUBLIC glm)
 target_compile_definitions(${TARGET_NAME} PUBLIC -DPROJECT_ROOT="${PROJECT_ROOT}")

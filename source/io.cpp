@@ -6,10 +6,10 @@
 
 namespace io {
 
-    Scene load_scene(std::string a_path) {
+    Scene load_scene(const std::string& a_path) {
         std::ifstream in(a_path);
         if (!in.is_open()) {
-            throw std::runtime_error("Bad path to scene.");
+            throw std::runtime_error("Bad path to scene file.");
         }
         Scene scene;
         std::string line;
@@ -42,19 +42,20 @@ namespace io {
             }
             else if (command == "NEW_PRIMITIVE") {
                 std::getline(in, line);
+                std::stringstream ss(line);
                 ss >> command;
                 if (command == "PLANE") {
-                    plane new_plane{};
+                    Plane new_plane{};
                     ss >> new_plane.normal.x >> new_plane.normal.y >> new_plane.normal.z;
                     scene.primitives.push_back(new_plane);
                 }
                 else if (command == "ELLIPSOID") {
-                    ellipsoid new_ellipsoid{};
+                    Ellipsoid new_ellipsoid{};
                     ss >> new_ellipsoid.radius.x >> new_ellipsoid.radius.y >> new_ellipsoid.radius.z;
                     scene.primitives.push_back(new_ellipsoid);
                 }
                 else if (command == "BOX") {
-                    box new_box{};
+                    Box new_box{};
                     ss >> new_box.size.x >> new_box.size.y >> new_box.size.z;
                     scene.primitives.push_back(new_box);
                 }
@@ -69,10 +70,9 @@ namespace io {
             }
             else if (command == "COLOR") {
                 auto& primitive = scene.primitives.back();
-                ss >> primitive.position.x >> primitive.position.y >> primitive.position.z;
+                ss >> primitive.color.x >> primitive.color.y >> primitive.position.z;
             }
         }
-    
         return scene;
     }
 
