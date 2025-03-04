@@ -73,10 +73,9 @@ void write_image(const std::string& a_path, std::uint32_t width, std::uint32_t h
     if (!out.is_open()) {
         throw std::runtime_error("Bad path to image file.");
     }
-    out << "P6\n" << width << height << "\n255\n";
-    for (std::uint8_t color_byte : a_image) {
-        out << color_byte;
-    }
+    out << "P6\n" << width << ' ' << height << "\n255\n";
+    out.write(reinterpret_cast<const char*>(a_image.data()), width * height * 3);
+    out.close();
 }
 
 } // namespace io
