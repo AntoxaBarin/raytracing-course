@@ -19,6 +19,10 @@ set(SOURCE
     source/scene.cpp
     source/primitive.hpp 
     source/primitive.cpp
+    source/image.hpp
+    source/image.cpp
+    source/ray.hpp
+    source/ray.cpp
 )
 
 add_executable(${TARGET_NAME} ${SOURCE})

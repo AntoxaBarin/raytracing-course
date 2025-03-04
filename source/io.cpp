@@ -2,11 +2,12 @@
 #include "primitive.hpp"
 
 #include <fstream>
+#include <ostream>
 #include <sstream>
 
 namespace io {
 
-Scene load_scene(const std::string &a_path) {
+Scene load_scene(const std::string& a_path) {
     std::ifstream in(a_path);
     if (!in.is_open()) {
         throw std::runtime_error("Bad path to scene file.");
@@ -24,15 +25,15 @@ Scene load_scene(const std::string &a_path) {
         } else if (command == "BG_COLOR") {
             ss >> scene.bg_color.x >> scene.bg_color.y >> scene.bg_color.z;
         } else if (command == "CAMERA_POSITION") {
-            ss >> scene.camera_position.x >> scene.camera_position.y >> scene.camera_position.z;
+            ss >> scene.camera.camera_position.x >> scene.camera.camera_position.y >> scene.camera.camera_position.z;
         } else if (command == "CAMERA_RIGHT") {
-            ss >> scene.camera_right.x >> scene.camera_right.y >> scene.camera_right.z;
+            ss >> scene.camera.camera_right.x >> scene.camera.camera_right.y >> scene.camera.camera_right.z;
         } else if (command == "CAMERA_UP") {
-            ss >> scene.camera_up.x >> scene.camera_up.y >> scene.camera_up.z;
+            ss >> scene.camera.camera_up.x >> scene.camera.camera_up.y >> scene.camera.camera_up.z;
         } else if (command == "CAMERA_FORWARD") {
-            ss >> scene.camera_forward.x >> scene.camera_forward.y >> scene.camera_forward.z;
+            ss >> scene.camera.camera_forward.x >> scene.camera.camera_forward.y >> scene.camera.camera_forward.z;
         } else if (command == "CAMERA_FOV_X") {
-            ss >> scene.camera_fov_x;
+            ss >> scene.camera.camera_fov_x;
         } else if (command == "NEW_PRIMITIVE") {
             std::getline(in, line);
             std::stringstream ss(line);
@@ -51,17 +52,28 @@ Scene load_scene(const std::string &a_path) {
                 scene.primitives.push_back(new_box);
             }
         } else if (command == "POSITION") {
-            auto &primitive = scene.primitives.back();
+            auto& primitive = scene.primitives.back();
             ss >> primitive.position.x >> primitive.position.y >> primitive.position.z;
         } else if (command == "ROTATION") {
-            auto &primitive = scene.primitives.back();
+            auto& primitive = scene.primitives.back();
             ss >> primitive.rotation.x >> primitive.rotation.y >> primitive.rotation.z >> primitive.rotation.w;
         } else if (command == "COLOR") {
-            auto &primitive = scene.primitives.back();
+            auto& primitive = scene.primitives.back();
             ss >> primitive.color.x >> primitive.color.y >> primitive.position.z;
         }
     }
     return scene;
+}
+
+void write_image(const std::string& a_path, const Scene& a_scene, const Image& a_image) {
+    std::ofstream out(a_path);
+    if (!out.is_open()) {
+        throw std::runtime_error("Bad path to image file.");
+    }
+    out << "P6\n" << a_scene.width << a_scene.height << "\n255\n";
+    for (std::uint8_t color_byte : a_image) {
+        out << color_byte;
+    }
 }
 
 } // namespace io
