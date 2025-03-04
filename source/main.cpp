@@ -10,6 +10,7 @@ int main(int argc, char* argv[]) {
     }
 
     Scene scene = io::load_scene(argv[1]);
+    std::cout << scene;
     Image image = generate_image(scene);
     io::write_image(argv[2], scene.width, scene.height, image);
 }

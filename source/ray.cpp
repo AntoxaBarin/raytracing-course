@@ -1,8 +1,9 @@
 #include "ray.hpp"
+#include "glm/geometric.hpp"
+#include "glm/matrix.hpp"
 #include "primitive.hpp"
 
 #include <cmath>
-#include <limits>
 #include <optional>
 #include <stdexcept>
 
@@ -14,17 +15,17 @@ Ray generate_ray(const Scene& a_scene, std::pair<std::uint32_t, std::uint32_t> a
     Ray ray{};
     ray.start = a_scene.camera.camera_position;
 
-    float x = a_pixel_coord.first + 0.5;
-    float y = a_pixel_coord.second + 0.5;
+    float x = static_cast<float>(a_pixel_coord.first) + 0.5;
+    float y = static_cast<float>(a_pixel_coord.second) + 0.5;
 
     x = (2.f * x / static_cast<float>(a_scene.width) - 1) * tanf(a_scene.camera.camera_fov_x / 2);
     y = -(2.f * y / static_cast<float>(a_scene.height) - 1) *
         (tanf(a_scene.camera.camera_fov_x / 2) / (static_cast<float>(a_scene.width) / a_scene.height));
-    ray.direction = x * a_scene.camera.camera_right + y * a_scene.camera.camera_up + a_scene.camera.camera_forward;
+    ray.direction = glm::normalize(x * a_scene.camera.camera_right + y * a_scene.camera.camera_up + a_scene.camera.camera_forward);
     return ray;
 }
 
-std::optional<float> intersection(const Ray& a_ray, Plane* a_plane) {
+std::optional<float> intersection(Ray& a_ray, Plane* a_plane) {
     float t = -glm::dot(a_ray.start, a_plane->normal) / glm::dot(a_ray.direction, a_plane->normal);
     if (t < 0) {
         return {};
@@ -32,7 +33,7 @@ std::optional<float> intersection(const Ray& a_ray, Plane* a_plane) {
     return t;
 }
 
-std::optional<float> intersection(const Ray& a_ray, Ellipsoid* a_ellips) {
+std::optional<float> intersection(Ray& a_ray, Ellipsoid* a_ellips) {
     float a = glm::dot(
         glm::vec3{a_ray.direction.x / a_ellips->radius.x, a_ray.direction.y / a_ellips->radius.y, a_ray.direction.z / a_ellips->radius.z},
         glm::vec3{a_ray.direction.x / a_ellips->radius.x, a_ray.direction.y / a_ellips->radius.y, a_ray.direction.z / a_ellips->radius.z});
@@ -60,7 +61,7 @@ std::optional<float> intersection(const Ray& a_ray, Ellipsoid* a_ellips) {
     return root_2;
 }
 
-std::optional<float> intersection(const Ray& a_ray, Box* a_box) {
+std::optional<float> intersection(Ray& a_ray, Box* a_box) {
     float tx_1 = (a_box->size.x - a_ray.start.x) / a_ray.direction.x;
     float tx_2 = (-a_box->size.x - a_ray.start.x) / a_ray.direction.x;
     if (tx_2 < tx_1) {
@@ -86,10 +87,15 @@ std::optional<float> intersection(const Ray& a_ray, Box* a_box) {
     } else if (t_1 < 0) {
         return t_2;
     }
-    return {};
+    return t_1;
 }
 
-std::optional<float> intersection(const Ray& a_ray, Shape* a_object) {
+std::optional<float> intersection(Ray& a_ray, Shape* a_object) {
+    a_ray.start -= a_object->position;
+    glm::quat reversed_rotation = glm::inverse(a_object->rotation);
+    a_ray.start = reversed_rotation * a_ray.start;
+    a_ray.direction = glm::normalize(reversed_rotation * a_ray.direction);
+
     switch (a_object->type) {
     case PRIMITIVE_TYPE::Plane:
         return intersection(a_ray, dynamic_cast<Plane*>(a_object));
@@ -102,25 +108,22 @@ std::optional<float> intersection(const Ray& a_ray, Shape* a_object) {
     }
 }
 
-std::pair<float, Color> raytrace(const Ray& a_ray, const Scene& a_scene) {
-    std::pair<float, Color> result;
-    result.second = {
+std::pair<std::optional<float>, Color> raytrace(Ray& a_ray, const Scene& a_scene) {
+    Color color = {
         color_converter(a_scene.bg_color.x), 
         color_converter(a_scene.bg_color.y), 
         color_converter(a_scene.bg_color.z)
     };
-    float min_t = std::numeric_limits<float>::max();
+    std::optional<float> intersection_t = std::nullopt;
 
     for (auto primitive : a_scene.primitives) {
         auto intersection_result = intersection(a_ray, primitive);
-        if (!intersection_result) {
-            continue;
-        } else if (intersection_result.value() < min_t) {
-            min_t = intersection_result.value();
-            result.second = {color_converter(primitive->color.x), color_converter(primitive->color.y), color_converter(primitive->color.z)};
+        if (intersection_result.has_value() && (!intersection_t.has_value() || intersection_t.value() > intersection_result.value())) {
+            intersection_t = intersection_result;
+            color = {color_converter(primitive->color.x), color_converter(primitive->color.y), color_converter(primitive->color.z)};
         }
     }
-    return result;
+    return {intersection_t, color};
 }
 
 } // namespace ray
