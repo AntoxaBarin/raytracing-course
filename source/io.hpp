@@ -8,6 +8,6 @@
 namespace io {
 
 Scene load_scene(const std::string& a_path);
-void write_image(const std::string& a_path, const Scene& a_scene, const Image& a_image);
+void write_image(const std::string& a_path, std::uint32_t width, std::uint32_t height, const Image& a_image);
 
 } // namespace io

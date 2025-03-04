@@ -62,18 +62,18 @@ Scene load_scene(const std::string& a_path) {
             ss >> primitive.rotation.x >> primitive.rotation.y >> primitive.rotation.z >> primitive.rotation.w;
         } else if (command == "COLOR") {
             auto& primitive = scene.primitives.back();
-            ss >> primitive.color.x >> primitive.color.y >> primitive.position.z;
+            ss >> primitive.color.x >> primitive.color.y >> primitive.color.z;
         }
     }
     return scene;
 }
 
-void write_image(const std::string& a_path, const Scene& a_scene, const Image& a_image) {
+void write_image(const std::string& a_path, std::uint32_t width, std::uint32_t height, const Image& a_image) {
     std::ofstream out(a_path, std::ios::binary);
     if (!out.is_open()) {
         throw std::runtime_error("Bad path to image file.");
     }
-    out << "P6\n" << a_scene.width << a_scene.height << "\n255\n";
+    out << "P6\n" << width << height << "\n255\n";
     for (std::uint8_t color_byte : a_image) {
         out << color_byte;
     }
