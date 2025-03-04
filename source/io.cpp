@@ -1,4 +1,5 @@
 #include "io.hpp"
+#include "glm/geometric.hpp"
 #include "primitive.hpp"
 
 #include <fstream>
@@ -42,6 +43,7 @@ Scene load_scene(const std::string& a_path) {
             if (command == "PLANE") {
                 Plane new_plane{};
                 ss >> new_plane.normal.x >> new_plane.normal.y >> new_plane.normal.z;
+                new_plane.normal = glm::normalize(new_plane.normal);
                 scene.primitives.push_back(new_plane);
             } else if (command == "ELLIPSOID") {
                 Ellipsoid new_ellipsoid{};
