@@ -2,6 +2,7 @@
 #include "primitive.hpp"
 
 #include <fstream>
+#include <ios>
 #include <ostream>
 #include <sstream>
 
@@ -66,7 +67,7 @@ Scene load_scene(const std::string& a_path) {
 }
 
 void write_image(const std::string& a_path, const Scene& a_scene, const Image& a_image) {
-    std::ofstream out(a_path);
+    std::ofstream out(a_path, std::ios::binary);
     if (!out.is_open()) {
         throw std::runtime_error("Bad path to image file.");
     }

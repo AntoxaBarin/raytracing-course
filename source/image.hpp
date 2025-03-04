@@ -2,7 +2,6 @@
 
 #include "scene.hpp"
 
-#include <array>
 #include <cstdint>
 #include <vector>
 

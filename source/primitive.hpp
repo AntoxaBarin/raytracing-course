@@ -13,6 +13,8 @@ struct Shape {
     glm::vec3 position;
     glm::quat rotation;
     PRIMITIVE_TYPE type;
+
+    virtual ~Shape() = default;
 };
 
 struct Plane : Shape {
