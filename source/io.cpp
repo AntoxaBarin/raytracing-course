@@ -41,28 +41,28 @@ Scene load_scene(const std::string& a_path) {
             std::stringstream ss(line);
             ss >> command;
             if (command == "PLANE") {
-                Plane new_plane{};
-                ss >> new_plane.normal.x >> new_plane.normal.y >> new_plane.normal.z;
-                new_plane.normal = glm::normalize(new_plane.normal);
+                Plane* new_plane = new Plane();
+                ss >> new_plane->normal.x >> new_plane->normal.y >> new_plane->normal.z;
+                new_plane->normal = glm::normalize(new_plane->normal);
                 scene.primitives.push_back(new_plane);
             } else if (command == "ELLIPSOID") {
-                Ellipsoid new_ellipsoid{};
-                ss >> new_ellipsoid.radius.x >> new_ellipsoid.radius.y >> new_ellipsoid.radius.z;
+                Ellipsoid* new_ellipsoid = new Ellipsoid();
+                ss >> new_ellipsoid->radius.x >> new_ellipsoid->radius.y >> new_ellipsoid->radius.z;
                 scene.primitives.push_back(new_ellipsoid);
             } else if (command == "BOX") {
-                Box new_box{};
-                ss >> new_box.size.x >> new_box.size.y >> new_box.size.z;
+                Box* new_box = new Box();
+                ss >> new_box->size.x >> new_box->size.y >> new_box->size.z;
                 scene.primitives.push_back(new_box);
             }
         } else if (command == "POSITION") {
-            auto& primitive = scene.primitives.back();
-            ss >> primitive.position.x >> primitive.position.y >> primitive.position.z;
+            auto primitive = scene.primitives.back();
+            ss >> primitive->position.x >> primitive->position.y >> primitive->position.z;
         } else if (command == "ROTATION") {
-            auto& primitive = scene.primitives.back();
-            ss >> primitive.rotation.x >> primitive.rotation.y >> primitive.rotation.z >> primitive.rotation.w;
+            auto primitive = scene.primitives.back();
+            ss >> primitive->rotation.x >> primitive->rotation.y >> primitive->rotation.z >> primitive->rotation.w;
         } else if (command == "COLOR") {
-            auto& primitive = scene.primitives.back();
-            ss >> primitive.color.x >> primitive.color.y >> primitive.color.z;
+            auto primitive = scene.primitives.back();
+            ss >> primitive->color.x >> primitive->color.y >> primitive->color.z;
         }
     }
     return scene;

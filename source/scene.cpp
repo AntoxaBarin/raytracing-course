@@ -1,4 +1,5 @@
 #include "scene.hpp"
+#include "primitive.hpp"
 
 std::ostream& operator<<(std::ostream& a_out, const Scene& a_scene) {
     a_out << "H: " << a_scene.height << " W: " << a_scene.width << '\n'
@@ -10,7 +11,20 @@ std::ostream& operator<<(std::ostream& a_out, const Scene& a_scene) {
           << '\n'
           << "UP: " << a_scene.camera.camera_up.x << ' ' << a_scene.camera.camera_up.y << ' ' << a_scene.camera.camera_up.z << '\n'
           << "FORWARD: " << a_scene.camera.camera_forward.x << ' ' << a_scene.camera.camera_forward.y << ' '
-          << a_scene.camera.camera_forward.z << '\n';
+          << a_scene.camera.camera_forward.z << "\n\n";
+
+    for (auto& primitive : a_scene.primitives) {
+        a_out << "Primitive: ";
+        if (primitive->type == PRIMITIVE_TYPE::Plane) {
+            a_out << "Plane\n";
+        } else if (primitive->type == PRIMITIVE_TYPE::Ellipsoid) {
+            a_out << "Ellipsoid\n";
+        } else if (primitive->type == PRIMITIVE_TYPE::Box) {
+            a_out << "Box\n";
+        }
+        a_out << "Position: " << primitive->position.x << ' ' << primitive->position.y << ' ' << primitive->position.z << '\n'
+              << "Color: " << primitive->color.x << ' ' << primitive->color.y << ' ' << primitive->color.z << "\n";
+    }
 
     return a_out;
 }

@@ -21,7 +21,7 @@ struct Scene {
     std::uint32_t width;
     glm::vec3 bg_color;
     Camera camera;
-    std::vector<Shape> primitives;
+    std::vector<Shape*> primitives;
 };
 
 std::ostream& operator<<(std::ostream& a_out, const Scene& a_scene);
