@@ -81,9 +81,6 @@ Scene load_scene(const std::string& a_path)
             auto primitive = scene.primitives.back();
             ss >> primitive->color.x >> primitive->color.y >> primitive->color.z;
         }
-        else if (command != "") {
-            throw std::runtime_error("Unknown command " + command + " in scene file.");
-        }
     }
     return scene;
 }
