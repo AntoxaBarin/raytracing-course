@@ -1,6 +1,6 @@
 #include <iostream>
+#include <stdexcept>
 
-#include "image.hpp"
 #include "io.hpp"
 
 int main(int argc, char* argv[])
@@ -10,7 +10,12 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    Scene scene = io::load_scene(argv[1]);
-    Image image = generate_image(scene);
-    io::write_image(argv[2], scene.width, scene.height, image);
+    try {
+        Scene scene = io::load_scene(argv[1]);
+        Image image = generate_image(scene);
+        io::write_image(argv[2], scene.width, scene.height, image);
+    }
+    catch (const std::runtime_error& e) {
+        std::cerr << e.what() << std::endl;
+    }
 }

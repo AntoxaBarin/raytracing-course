@@ -6,6 +6,7 @@
 #include <ios>
 #include <ostream>
 #include <sstream>
+#include <stdexcept>
 
 namespace io {
 
@@ -79,6 +80,9 @@ Scene load_scene(const std::string& a_path)
         else if (command == "COLOR") {
             auto primitive = scene.primitives.back();
             ss >> primitive->color.x >> primitive->color.y >> primitive->color.z;
+        }
+        else if (command != "") {
+            throw std::runtime_error("Unknown command " + command + " in scene file.");
         }
     }
     return scene;

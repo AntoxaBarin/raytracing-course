@@ -1,13 +1,15 @@
 #include "scene.hpp"
 #include "primitive.hpp"
 
-Scene::~Scene() {
-    for (auto primitive: primitives) {
+Scene::~Scene()
+{
+    for (Shape* primitive : primitives) {
         delete primitive;
     }
 }
 
-std::ostream& operator<<(std::ostream& a_out, const Scene& a_scene) {
+std::ostream& operator<<(std::ostream& a_out, const Scene& a_scene)
+{
     a_out << "H: " << a_scene.height << " W: " << a_scene.width << '\n'
           << "BG_COLOR: " << a_scene.bg_color.x << ' ' << a_scene.bg_color.y << ' ' << a_scene.bg_color.z << '\n'
           << "CAMERA.\nFOV_X: " << a_scene.camera.camera_fov_x << '\n'
@@ -25,11 +27,13 @@ std::ostream& operator<<(std::ostream& a_out, const Scene& a_scene) {
             a_out << "Plane\n";
             Plane* plane = dynamic_cast<Plane*>(primitive);
             a_out << plane->normal.x << ' ' << plane->normal.y << ' ' << plane->normal.z << '\n';
-        } else if (primitive->type == PRIMITIVE_TYPE::Ellipsoid) {
+        }
+        else if (primitive->type == PRIMITIVE_TYPE::Ellipsoid) {
             a_out << "Ellipsoid\n";
             Ellipsoid* ellips = dynamic_cast<Ellipsoid*>(primitive);
             a_out << ellips->radius.x << ' ' << ellips->radius.y << ' ' << ellips->radius.z << '\n';
-        } else if (primitive->type == PRIMITIVE_TYPE::Box) {
+        }
+        else if (primitive->type == PRIMITIVE_TYPE::Box) {
             a_out << "Box\n";
             Box* plane = dynamic_cast<Box*>(primitive);
             a_out << plane->size.x << ' ' << plane->size.y << ' ' << plane->size.z << '\n';

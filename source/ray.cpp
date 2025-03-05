@@ -48,17 +48,17 @@ std::optional<float> intersection(Ray& r, Ellipsoid* e)
     if (D < 0) {
         return {};
     }
-    float root_1 = (-b - sqrt(D)) / a;
-    float root_2 = (-b + sqrt(D)) / a;
-    if (root_1 < 0) {
-        if (root_2 < 0) {
+    float t_1 = (-b - sqrt(D)) / a;
+    float t_2 = (-b + sqrt(D)) / a;
+    if (t_1 < 0) {
+        if (t_2 < 0) {
             return {};
         }
         else {
-            return root_2;
+            return t_2;
         }
     }
-    return root_1;
+    return t_1;
 }
 
 std::optional<float> intersection(Ray& a_ray, Box* a_box)
@@ -93,7 +93,7 @@ std::optional<float> intersection(Ray& a_ray, Box* a_box)
     return t_1;
 }
 
-std::optional<float> intersection(Ray& a_ray, Shape* a_object)
+std::optional<float> intersection(Ray a_ray, Shape* a_object)
 {
     a_ray.start -= a_object->position;
     glm::quat reversed_rotation = glm::inverse(a_object->rotation);
@@ -119,7 +119,10 @@ std::pair<std::optional<float>, Color> raytrace(Ray& a_ray, const Scene& a_scene
 
     for (auto primitive : a_scene.primitives) {
         auto intersection_result = intersection(a_ray, primitive);
-        if (intersection_result.has_value() && (!intersection_t.has_value() || intersection_t.value() > intersection_result.value())) {
+        if (!intersection_result.has_value()) {
+            continue;
+        }
+        if (!intersection_t.has_value() || intersection_t.value() > intersection_result.value()) {
             intersection_t = intersection_result;
             color = {color_converter(primitive->color.x), color_converter(primitive->color.y), color_converter(primitive->color.z)};
         }
