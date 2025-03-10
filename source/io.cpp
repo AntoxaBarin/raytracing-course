@@ -8,7 +8,7 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace io {
+namespace engine::io {
 
 Scene load_scene(const std::string& a_path)
 {
@@ -96,4 +96,4 @@ void write_image(const std::string& a_path, std::uint32_t width, std::uint32_t h
     out.close();
 }
 
-} // namespace io
+} // namespace engine::io

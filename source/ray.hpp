@@ -8,7 +8,7 @@
 #include <optional>
 #include <utility>
 
-namespace ray {
+namespace engine::ray {
 
 using Color = std::array<std::uint8_t, 3>;
 
@@ -30,4 +30,4 @@ std::optional<float> intersection(Ray& a_ray, const Box& a_box);
 std::optional<float> intersection(Ray& a_ray, const Shape& a_object);
 std::pair<std::optional<float>, Color> raytrace(Ray& a_ray, const Scene& a_scene);
 
-} // namespace ray
+} // namespace engine::ray

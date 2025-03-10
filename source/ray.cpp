@@ -6,7 +6,7 @@
 #include <optional>
 #include <stdexcept>
 
-namespace ray {
+namespace engine::ray {
 
 uint8_t color_converter(float value) { return static_cast<uint8_t>(std::round(value * 255.0f)); }
 
@@ -130,4 +130,4 @@ std::pair<std::optional<float>, Color> raytrace(Ray& a_ray, const Scene& a_scene
     return {intersection_t, color};
 }
 
-} // namespace ray
+} // namespace engine::ray

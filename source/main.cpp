@@ -11,9 +11,9 @@ int main(int argc, char* argv[])
     }
 
     try {
-        Scene scene = io::load_scene(std::string(argv[1]));
-        Image image = generate_image(scene);
-        io::write_image(std::string(argv[2]), scene.width, scene.height, image);
+        engine::Scene scene = engine::io::load_scene(std::string(argv[1]));
+        engine::Image image = engine::generate_image(scene);
+        engine::io::write_image(std::string(argv[2]), scene.width, scene.height, image);
     }
     catch (const std::runtime_error& e) {
         std::cerr << e.what() << std::endl;

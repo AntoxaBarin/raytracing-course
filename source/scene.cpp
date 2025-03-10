@@ -1,6 +1,8 @@
 #include "scene.hpp"
 #include "primitive.hpp"
 
+namespace engine {
+
 Scene::~Scene()
 {
     for (Shape* primitive : primitives) {
@@ -44,3 +46,5 @@ std::ostream& operator<<(std::ostream& a_out, const Scene& a_scene)
 
     return a_out;
 }
+
+} // namespace engine

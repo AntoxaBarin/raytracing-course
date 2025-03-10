@@ -8,6 +8,8 @@
 #include <iostream>
 #include <vector>
 
+namespace engine {
+
 struct Camera {
     float camera_fov_x;
     glm::vec3 camera_position;
@@ -27,3 +29,5 @@ struct Scene {
 };
 
 std::ostream& operator<<(std::ostream& a_out, const Scene& a_scene);
+
+} // namespace engine

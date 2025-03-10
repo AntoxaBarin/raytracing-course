@@ -1,6 +1,8 @@
 #include "image.hpp"
 #include "ray.hpp"
 
+namespace engine {
+
 Image generate_image(const Scene& a_scene)
 {
     Image result{};
@@ -21,3 +23,5 @@ Image generate_image(const Scene& a_scene)
     }
     return result;
 }
+
+} // namespace engine

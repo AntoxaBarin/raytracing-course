@@ -4,6 +4,8 @@
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
 
+namespace engine {
+
 enum class PRIMITIVE_TYPE { Plane, Ellipsoid, Box };
 
 struct Shape {
@@ -34,3 +36,5 @@ struct Box : Shape {
 
     glm::vec3 size;
 };
+
+} // namespace engine
