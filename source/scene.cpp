@@ -8,6 +8,9 @@ Scene::~Scene()
     for (Shape* primitive : primitives) {
         delete primitive;
     }
+    for (Light* light: lights) {
+        delete light;
+    }
 }
 
 std::ostream& operator<<(std::ostream& a_out, const Scene& a_scene)
@@ -41,7 +44,15 @@ std::ostream& operator<<(std::ostream& a_out, const Scene& a_scene)
             a_out << plane->size.x << ' ' << plane->size.y << ' ' << plane->size.z << '\n';
         }
         a_out << "Position: " << primitive->position.x << ' ' << primitive->position.y << ' ' << primitive->position.z << '\n'
-              << "Color: " << primitive->color.x << ' ' << primitive->color.y << ' ' << primitive->color.z << "\n";
+              << "Color: " << primitive->color.x << ' ' << primitive->color.y << ' ' << primitive->color.z << "\n\n";
+    }
+
+    for (auto light : a_scene.lights) {
+        a_out << "Light:\n"
+              << light->intensity.r << ' ' << light->intensity.g << ' ' << light->intensity.b << '\n'
+              << light->direction.x << ' ' << light->direction.y << ' ' << light->direction.z << '\n'
+              << light->position.x << ' ' << light->position.y << ' ' << light->position.z << '\n'
+              << light->attenuation.x << ' ' << light->attenuation.y << ' ' << light->attenuation.z << "\n\n";
     }
 
     return a_out;

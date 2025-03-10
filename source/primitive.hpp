@@ -7,6 +7,7 @@
 namespace engine {
 
 enum class PRIMITIVE_TYPE { Plane, Ellipsoid, Box };
+enum class MATERIAL_TYPE { Metallic, Dielectric, Diffuse };
 
 struct Shape {
     Shape(PRIMITIVE_TYPE a_type);
@@ -15,6 +16,8 @@ struct Shape {
     glm::vec3 position;
     glm::quat rotation;
     PRIMITIVE_TYPE type;
+    MATERIAL_TYPE material;
+    float ior;
 
     virtual ~Shape() = default;
 };
@@ -35,6 +38,13 @@ struct Box : Shape {
     Box();
 
     glm::vec3 size;
+};
+
+struct Light {
+    glm::vec3 intensity;
+    glm::vec3 direction;
+    glm::vec3 position;
+    glm::vec3 attenuation;
 };
 
 } // namespace engine

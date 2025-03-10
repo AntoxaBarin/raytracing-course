@@ -48,6 +48,32 @@ Scene load_scene(const std::string& a_path)
         else if (command == "CAMERA_FOV_X") {
             ss >> scene.camera.camera_fov_x;
         }
+        else if (command == "RAY_DEPTH") {
+            ss >> scene.ray_depth;
+        }
+        else if (command == "AMBIENT_LIGHT") {
+            ss >> scene.ambient_light.r >> scene.ambient_light.g >> scene.ambient_light.b;
+        }
+        else if (command == "NEW_LIGHT") {
+            Light* new_light = new Light();
+            scene.lights.push_back(new_light);
+        }
+        else if (command == "LIGHT_INTENSITY") {
+            auto light = scene.lights.back();
+            ss >> light->intensity.r >> light->intensity.g >> light->intensity.b; 
+        }
+        else if (command == "LIGHT_DIRECTION") {
+            auto light = scene.lights.back();
+            ss >> light->direction.x >> light->direction.y >> light->direction.z;
+        }
+        else if (command == "LIGHT_POSITION") {
+            auto light = scene.lights.back();
+            ss >> light->position.x >> light->position.y >> light->position.z;
+        }
+        else if (command == "LIGHT_ATTENUATION") {
+            auto light = scene.lights.back();
+            ss >> light->attenuation.x >> light->attenuation.y >> light->attenuation.z;
+        }
         else if (command == "NEW_PRIMITIVE") {
             std::getline(in, line);
             std::stringstream ss(line);
@@ -80,6 +106,15 @@ Scene load_scene(const std::string& a_path)
         else if (command == "COLOR") {
             auto primitive = scene.primitives.back();
             ss >> primitive->color.x >> primitive->color.y >> primitive->color.z;
+        }
+        else if (command == "METALLIC") {
+            scene.primitives.back()->material = MATERIAL_TYPE::Metallic;
+        }
+        else if (command == "DIELECTRIC") {
+            scene.primitives.back()->material = MATERIAL_TYPE::Dielectric;
+        }
+        else if (command == "IOR") {
+            ss >> scene.primitives.back()->ior;
         }
     }
     return scene;
