@@ -1,14 +1,13 @@
 #include "ray.hpp"
 #include "glm/geometric.hpp"
 #include "primitive.hpp"
+#include "utils.hpp"
 
 #include <cmath>
 #include <optional>
 #include <stdexcept>
 
 namespace engine::ray {
-
-uint8_t color_converter(float value) { return static_cast<uint8_t>(std::round(value * 255.0f)); }
 
 Ray generate_ray(const Scene& a_scene, std::pair<std::uint32_t, std::uint32_t> a_pixel_coord)
 {
@@ -114,7 +113,7 @@ std::optional<float> intersection(Ray a_ray, Shape* a_object)
 
 std::pair<std::optional<float>, Color> raytrace(Ray& a_ray, const Scene& a_scene)
 {
-    Color color = {color_converter(a_scene.bg_color.x), color_converter(a_scene.bg_color.y), color_converter(a_scene.bg_color.z)};
+    Color color = color_converter(a_scene.bg_color);
     std::optional<float> intersection_t = std::nullopt;
 
     for (auto primitive : a_scene.primitives) {
@@ -124,7 +123,7 @@ std::pair<std::optional<float>, Color> raytrace(Ray& a_ray, const Scene& a_scene
         }
         if (!intersection_t.has_value() || intersection_t.value() > intersection_result.value()) {
             intersection_t = intersection_result;
-            color = {color_converter(primitive->color.x), color_converter(primitive->color.y), color_converter(primitive->color.z)};
+            color = color_converter(primitive->color);
         }
     }
     return {intersection_t, color};

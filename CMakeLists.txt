@@ -23,6 +23,8 @@ set(SOURCE
     source/image.cpp
     source/ray.hpp
     source/ray.cpp
+    source/utils.hpp
+    source/utils.cpp
 )
 
 add_executable(${TARGET_NAME} ${SOURCE})
