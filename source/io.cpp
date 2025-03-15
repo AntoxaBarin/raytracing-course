@@ -10,8 +10,8 @@
 
 namespace engine::io {
 
-Scene load_scene(const std::string& a_path) {
-    std::ifstream in(a_path);
+Scene load_scene(const std::string& path) {
+    std::ifstream in(path);
     if (!in.is_open()) {
         throw std::runtime_error("Bad path to scene file.");
     }
@@ -64,6 +64,8 @@ Scene load_scene(const std::string& a_path) {
         else if (command == "LIGHT_DIRECTION") {
             auto light = scene.lights.back();
             ss >> light->direction.x >> light->direction.y >> light->direction.z;
+            light->direction = glm::normalize(light->direction);
+            light->type = LIGHT_TYPE::Directed;
         }
         else if (command == "LIGHT_POSITION") {
             auto light = scene.lights.back();

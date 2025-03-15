@@ -2,8 +2,8 @@
 
 namespace engine {
 
-Shape::Shape(PRIMITIVE_TYPE a_type)
-    : type(a_type),
+Shape::Shape(PRIMITIVE_TYPE type)
+    : type(type),
       color({0.f, 0.f, 0.f}),
       position({0.f, 0.f, 0.f}),
       rotation({1.f, 0.f, 0.f, 0.f}),
@@ -25,7 +25,8 @@ Light::Light()
     : intensity({0.f, 0.f, 0.f}),
       direction({0.f, 0.f, 0.f}),
       position({0.f, 0.f, 0.f}),
-      attenuation({0.f, 0.f, 0.f}) {}
+      attenuation({0.f, 0.f, 0.f}),
+      type(LIGHT_TYPE::Point) {}
 
 Intersection::Intersection()
     : t(0.f),

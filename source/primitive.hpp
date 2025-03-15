@@ -8,9 +8,10 @@ namespace engine {
 
 enum class PRIMITIVE_TYPE { Plane, Ellipsoid, Box };
 enum class MATERIAL_TYPE { Metallic, Dielectric, Diffuse };
+enum class LIGHT_TYPE { Point, Directed };
 
 struct Shape {
-    Shape(PRIMITIVE_TYPE a_type);
+    Shape(PRIMITIVE_TYPE type);
 
     glm::vec3 color;
     glm::vec3 position;
@@ -47,6 +48,7 @@ struct Light {
     glm::vec3 direction;
     glm::vec3 position;
     glm::vec3 attenuation;
+    LIGHT_TYPE type;
 };
 
 struct Intersection {

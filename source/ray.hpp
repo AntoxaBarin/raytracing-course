@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glm/ext/vector_float3.hpp"
+#include "primitive.hpp"
 #include "scene.hpp"
 
 #include <array>
@@ -23,10 +24,13 @@ struct Ray {
 };
 
 Ray generate_ray(const Scene& a_scene, std::pair<std::uint32_t, std::uint32_t> a_pixel_coord);
-std::optional<float> intersection(Ray& a_ray, const Plane& a_plane);
-std::optional<float> intersection(Ray& a_ray, const Ellipsoid& a_sphere);
-std::optional<float> intersection(Ray& a_ray, const Box& a_box);
-std::optional<float> intersection(Ray& a_ray, const Shape& a_object);
+std::optional<Intersection> intersection(Ray& a_ray, const Plane& a_plane);
+std::optional<Intersection> intersection(Ray& a_ray, const Ellipsoid& a_sphere);
+std::optional<Intersection> intersection(Ray& a_ray, const Box& a_box);
+std::optional<Intersection> intersection(Ray& a_ray, const Shape& a_object);
 std::pair<std::optional<float>, Color> raytrace(Ray& a_ray, const Scene& a_scene);
+
+Color calc_color(const Scene& scene, const Shape& obj, const glm::vec3& inter_point, const Intersection& inter);
+glm::vec3 calc_diffuse_rawcolor(const Scene& scene, const Shape& obj, const glm::vec3& inter_point, const Intersection& inter);
 
 } // namespace engine::ray

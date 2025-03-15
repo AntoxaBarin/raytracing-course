@@ -31,6 +31,6 @@ struct Scene {
     ~Scene();
 };
 
-std::ostream& operator<<(std::ostream& a_out, const Scene& a_scene);
+std::ostream& operator<<(std::ostream& out, const Scene& scene);
 
 } // namespace engine
