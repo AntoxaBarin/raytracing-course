@@ -41,10 +41,20 @@ struct Box : Shape {
 };
 
 struct Light {
+    Light();
+
     glm::vec3 intensity;
     glm::vec3 direction;
     glm::vec3 position;
     glm::vec3 attenuation;
+};
+
+struct Intersection {
+    Intersection();
+
+    float t;
+    glm::vec3 normal;
+    bool inside;
 };
 
 } // namespace engine

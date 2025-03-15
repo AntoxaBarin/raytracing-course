@@ -4,7 +4,7 @@ ColumnLimit: 140
 UseTab: Never
 BinPackArguments: false
 BinPackParameters: false
-PackConstructorInitializers: CurrentLine
+PackConstructorInitializers: Never
 PointerAlignment: Left
 BreakBeforeBraces: Custom
 BraceWrapping:
