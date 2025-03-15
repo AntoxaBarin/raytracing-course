@@ -3,8 +3,7 @@
 
 namespace engine {
 
-Image generate_image(const Scene& a_scene)
-{
+Image generate_image(const Scene& a_scene) {
     Image result{};
     result.resize(a_scene.height * a_scene.width * 3);
 

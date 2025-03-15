@@ -3,18 +3,16 @@
 
 namespace engine {
 
-Scene::~Scene()
-{
+Scene::~Scene() {
     for (Shape* primitive : primitives) {
         delete primitive;
     }
-    for (Light* light: lights) {
+    for (Light* light : lights) {
         delete light;
     }
 }
 
-std::ostream& operator<<(std::ostream& a_out, const Scene& a_scene)
-{
+std::ostream& operator<<(std::ostream& a_out, const Scene& a_scene) {
     a_out << "H: " << a_scene.height << " W: " << a_scene.width << '\n'
           << "BG_COLOR: " << a_scene.bg_color.x << ' ' << a_scene.bg_color.y << ' ' << a_scene.bg_color.z << '\n'
           << "CAMERA.\nFOV_X: " << a_scene.camera.camera_fov_x << '\n'

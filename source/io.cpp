@@ -10,8 +10,7 @@
 
 namespace engine::io {
 
-Scene load_scene(const std::string& a_path)
-{
+Scene load_scene(const std::string& a_path) {
     std::ifstream in(a_path);
     if (!in.is_open()) {
         throw std::runtime_error("Bad path to scene file.");
@@ -60,7 +59,7 @@ Scene load_scene(const std::string& a_path)
         }
         else if (command == "LIGHT_INTENSITY") {
             auto light = scene.lights.back();
-            ss >> light->intensity.r >> light->intensity.g >> light->intensity.b; 
+            ss >> light->intensity.r >> light->intensity.g >> light->intensity.b;
         }
         else if (command == "LIGHT_DIRECTION") {
             auto light = scene.lights.back();
@@ -120,8 +119,7 @@ Scene load_scene(const std::string& a_path)
     return scene;
 }
 
-void write_image(const std::string& a_path, std::uint32_t width, std::uint32_t height, const Image& a_image)
-{
+void write_image(const std::string& a_path, std::uint32_t width, std::uint32_t height, const Image& a_image) {
     std::ofstream out(a_path, std::ios::binary);
     if (!out.is_open()) {
         throw std::runtime_error("Bad path to image file.");

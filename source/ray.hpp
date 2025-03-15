@@ -13,8 +13,7 @@ namespace engine::ray {
 using Color = std::array<std::uint8_t, 3>;
 
 struct Ray {
-    Ray()
-    {
+    Ray() {
         start = {0.f, 0.f, 0.f};
         direction = {0.f, 0.f, 0.f};
     }
