@@ -121,13 +121,13 @@ Scene load_scene(const std::string& path) {
     return scene;
 }
 
-void write_image(const std::string& a_path, std::uint32_t width, std::uint32_t height, const Image& a_image) {
-    std::ofstream out(a_path, std::ios::binary);
+void write_image(const std::string& path, std::uint32_t width, std::uint32_t height, const Image& image) {
+    std::ofstream out(path, std::ios::binary);
     if (!out.is_open()) {
         throw std::runtime_error("Bad path to image file.");
     }
     out << "P6\n" << width << ' ' << height << "\n255\n";
-    out.write(reinterpret_cast<const char*>(a_image.data()), width * height * 3);
+    out.write(reinterpret_cast<const char*>(image.data()), width * height * 3);
     out.close();
 }
 

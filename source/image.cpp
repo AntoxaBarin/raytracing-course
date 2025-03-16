@@ -1,5 +1,6 @@
 #include "image.hpp"
 #include "ray.hpp"
+#include "utils.hpp"
 
 namespace engine {
 
@@ -12,8 +13,8 @@ Image generate_image(const Scene& scene) {
     for (size_t i = 0; i < H; ++i) {
         for (size_t j = 0; j < W; ++j) {
             ray::Ray ray = ray::generate_ray(scene, {j, i});
-            const auto& [_, color] = ray::raytrace(ray, scene);
-
+            const auto& [_, rawcolor] = ray::raytrace(ray, scene, 0);
+            ray::Color color = color_converter(rawcolor);
             size_t index = (i * W + j) * 3;
             result[index] = color.at(0);
             result[index + 1] = color.at(1);
