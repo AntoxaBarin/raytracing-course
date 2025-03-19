@@ -7,7 +7,8 @@ Shape::Shape(PRIMITIVE_TYPE type)
       color({0.f, 0.f, 0.f}),
       position({0.f, 0.f, 0.f}),
       rotation({1.f, 0.f, 0.f, 0.f}),
-      material(MATERIAL_TYPE::Diffuse) {}
+      material(MATERIAL_TYPE::Diffuse),
+      ior(1.f) {}
 
 Plane::Plane()
     : Shape(PRIMITIVE_TYPE::Plane),

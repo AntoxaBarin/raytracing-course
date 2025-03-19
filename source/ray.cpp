@@ -144,10 +144,13 @@ std::optional<Intersection> intersection(Ray ray, Shape* object) {
     switch (object->type) {
     case PRIMITIVE_TYPE::Plane:
         inter = intersection(ray, dynamic_cast<Plane*>(object));
+        break;
     case PRIMITIVE_TYPE::Ellipsoid:
         inter = intersection(ray, dynamic_cast<Ellipsoid*>(object));
+        break;
     case PRIMITIVE_TYPE::Box:
         inter = intersection(ray, dynamic_cast<Box*>(object));
+        break;
     default:
         throw std::runtime_error("Unknown primitive type");
     }
