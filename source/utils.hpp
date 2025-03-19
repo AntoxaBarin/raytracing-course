@@ -8,8 +8,7 @@
 
 namespace engine {
 
-glm::vec3 saturate(const glm::vec3& color);
-glm::vec3 aces_tonemap(const glm::vec3& x);
-ray::Color color_converter(glm::vec3 color);
+float tone_map(float in);
+std::uint8_t color_converter(float in);
 
 } // namespace engine

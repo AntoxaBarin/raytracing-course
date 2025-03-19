@@ -5,28 +5,24 @@
 #include "glm/vec3.hpp"
 
 #include <cmath>
+#include <algorithm>
 
 namespace engine {
 
-glm::vec3 saturate(const glm::vec3& color) { return glm::clamp(color, glm::vec3(0.0), glm::vec3(1.0)); }
-
-glm::vec3 aces_tonemap(const glm::vec3& x) {
+float tone_map(float in) {
     const float a = 2.51f;
     const float b = 0.03f;
     const float c = 2.43f;
     const float d = 0.59f;
     const float e = 0.14f;
-    return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
+    float color = (in * (a * in + b)) / (in * (c * in + d) + e);
+    return glm::clamp(color, 0.f, 1.f);
 }
 
-glm::vec3 gamma_correction(const glm::vec3& color) { return glm::pow(color, glm::vec3{1.0 / 2.2}); }
-
-ray::Color color_converter(glm::vec3 color) {
-    color = aces_tonemap(color);
-    color = gamma_correction(color);
-    return {static_cast<uint8_t>(std::round(color.x * 255.0f)),
-            static_cast<uint8_t>(std::round(color.y * 255.0f)),
-            static_cast<uint8_t>(std::round(color.z * 255.0f))};
+std::uint8_t color_converter(float in) {
+    in = tone_map(in);
+    in = std::pow(in, 1.0 / 2.2);
+    return std::round(std::clamp(in * 255, 0.f, 255.f));
 }
 
 } // namespace engine

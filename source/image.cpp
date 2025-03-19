@@ -14,11 +14,11 @@ Image generate_image(const Scene& scene) {
         for (size_t j = 0; j < W; ++j) {
             ray::Ray ray = ray::generate_ray(scene, {j, i});
             const auto& [_, rawcolor] = ray::raytrace(ray, scene, 0);
-            ray::Color color = color_converter(rawcolor);
+            
             size_t index = (i * W + j) * 3;
-            result[index] = color.at(0);
-            result[index + 1] = color.at(1);
-            result[index + 2] = color.at(2);
+            result[index] = color_converter(rawcolor.r);
+            result[index + 1] = color_converter(rawcolor.g);
+            result[index + 2] = color_converter(rawcolor.b);
         }
     }
     return result;
