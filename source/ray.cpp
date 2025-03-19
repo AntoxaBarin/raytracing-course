@@ -173,7 +173,7 @@ bool is_shadowed(const Scene& scene, const Ray& ray, float dist) {
 }
 
 glm::vec3 calc_diffuse_rawcolor(const Scene& scene, Shape* obj, const glm::vec3& inter_point, const Intersection& inter) {
-    glm::vec3 result_color = scene.ambient_light;
+    glm::vec3 result_color = scene.ambient_light * obj->color; 
     float eps = 1e-4;
     for (Light* light : scene.lights) {
         float dist = std::numeric_limits<float>::min();
