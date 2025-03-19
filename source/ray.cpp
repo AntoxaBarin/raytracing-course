@@ -249,7 +249,7 @@ glm::vec3 calc_dielectric_rawcolor(const Scene& scene, Shape* obj, Ray ray, cons
     if (inter.inside) {
         return reflected_light * reflected_color + (1 - reflected_light) * refracted_color;
     }
-    return reflected_light * reflected_color + (1 - reflected_light) * obj->color;
+    return reflected_light * reflected_color + (1 - reflected_light) * refracted_color * obj->color;
 }
 
 glm::vec3 calc_color(const Scene& scene, Shape* obj, Ray ray, const Intersection& inter, std::uint32_t ray_depth) {
