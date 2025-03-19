@@ -214,7 +214,7 @@ glm::vec3 calc_metallic_rawcolor(const Scene& scene, Shape* obj, Ray ray, const 
     reflected_ray.direction = ray.direction - 2.f * inter.normal * glm::dot(inter.normal, ray.direction);
     reflected_ray.start = inter_point + reflected_ray.direction * eps;
 
-    auto next_raytrace = raytrace(ray, scene, ray_depth + 1);
+    auto next_raytrace = raytrace(reflected_ray, scene, ray_depth + 1);
     return obj->color * next_raytrace.second;
 }
 
