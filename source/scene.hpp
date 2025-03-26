@@ -25,6 +25,7 @@ struct Scene {
     glm::vec3 ambient_light;
     Camera camera;
     std::uint32_t ray_depth;
+    std::uint32_t samples;
     std::vector<Shape*> primitives;
     std::vector<Light*> lights;
 

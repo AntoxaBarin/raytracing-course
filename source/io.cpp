@@ -50,6 +50,9 @@ Scene load_scene(const std::string& path) {
         else if (command == "RAY_DEPTH") {
             ss >> scene.ray_depth;
         }
+        else if (command == "SAMPLES") {
+            ss >> scene.samples;
+        }
         else if (command == "AMBIENT_LIGHT") {
             ss >> scene.ambient_light.r >> scene.ambient_light.g >> scene.ambient_light.b;
         }
@@ -113,6 +116,10 @@ Scene load_scene(const std::string& path) {
         }
         else if (command == "DIELECTRIC") {
             scene.primitives.back()->material = MATERIAL_TYPE::Dielectric;
+        }
+        else if (command == "EMISSION") {
+            auto primitive = scene.primitives.back();
+            ss >> primitive->emission.r >> primitive->emission.g >> primitive->emission.b;
         }
         else if (command == "IOR") {
             ss >> scene.primitives.back()->ior;
