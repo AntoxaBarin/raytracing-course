@@ -8,11 +8,10 @@
 #include <sstream>
 #include <stdexcept>
 
-namespace io {
+namespace engine::io {
 
-Scene load_scene(const std::string& a_path)
-{
-    std::ifstream in(a_path);
+Scene load_scene(const std::string& path) {
+    std::ifstream in(path);
     if (!in.is_open()) {
         throw std::runtime_error("Bad path to scene file.");
     }
@@ -48,6 +47,34 @@ Scene load_scene(const std::string& a_path)
         else if (command == "CAMERA_FOV_X") {
             ss >> scene.camera.camera_fov_x;
         }
+        else if (command == "RAY_DEPTH") {
+            ss >> scene.ray_depth;
+        }
+        else if (command == "AMBIENT_LIGHT") {
+            ss >> scene.ambient_light.r >> scene.ambient_light.g >> scene.ambient_light.b;
+        }
+        else if (command == "NEW_LIGHT") {
+            Light* new_light = new Light();
+            scene.lights.push_back(new_light);
+        }
+        else if (command == "LIGHT_INTENSITY") {
+            auto light = scene.lights.back();
+            ss >> light->intensity.r >> light->intensity.g >> light->intensity.b;
+        }
+        else if (command == "LIGHT_DIRECTION") {
+            auto light = scene.lights.back();
+            ss >> light->direction.x >> light->direction.y >> light->direction.z;
+            light->direction = glm::normalize(light->direction);
+            light->type = LIGHT_TYPE::Directed;
+        }
+        else if (command == "LIGHT_POSITION") {
+            auto light = scene.lights.back();
+            ss >> light->position.x >> light->position.y >> light->position.z;
+        }
+        else if (command == "LIGHT_ATTENUATION") {
+            auto light = scene.lights.back();
+            ss >> light->attenuation.x >> light->attenuation.y >> light->attenuation.z;
+        }
         else if (command == "NEW_PRIMITIVE") {
             std::getline(in, line);
             std::stringstream ss(line);
@@ -81,19 +108,27 @@ Scene load_scene(const std::string& a_path)
             auto primitive = scene.primitives.back();
             ss >> primitive->color.x >> primitive->color.y >> primitive->color.z;
         }
+        else if (command == "METALLIC") {
+            scene.primitives.back()->material = MATERIAL_TYPE::Metallic;
+        }
+        else if (command == "DIELECTRIC") {
+            scene.primitives.back()->material = MATERIAL_TYPE::Dielectric;
+        }
+        else if (command == "IOR") {
+            ss >> scene.primitives.back()->ior;
+        }
     }
     return scene;
 }
 
-void write_image(const std::string& a_path, std::uint32_t width, std::uint32_t height, const Image& a_image)
-{
-    std::ofstream out(a_path, std::ios::binary);
+void write_image(const std::string& path, std::uint32_t width, std::uint32_t height, const Image& image) {
+    std::ofstream out(path, std::ios::binary);
     if (!out.is_open()) {
         throw std::runtime_error("Bad path to image file.");
     }
     out << "P6\n" << width << ' ' << height << "\n255\n";
-    out.write(reinterpret_cast<const char*>(a_image.data()), width * height * 3);
+    out.write(reinterpret_cast<const char*>(image.data()), width * height * 3);
     out.close();
 }
 
-} // namespace io
+} // namespace engine::io

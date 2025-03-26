@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glm/ext/vector_float3.hpp"
+#include "primitive.hpp"
 #include "scene.hpp"
 
 #include <array>
@@ -8,13 +9,12 @@
 #include <optional>
 #include <utility>
 
-namespace ray {
+namespace engine::ray {
 
 using Color = std::array<std::uint8_t, 3>;
 
 struct Ray {
-    Ray()
-    {
+    Ray() {
         start = {0.f, 0.f, 0.f};
         direction = {0.f, 0.f, 0.f};
     }
@@ -23,11 +23,17 @@ struct Ray {
     glm::vec3 direction;
 };
 
-Ray generate_ray(const Scene& a_scene, std::pair<std::uint32_t, std::uint32_t> a_pixel_coord);
-std::optional<float> intersection(Ray& a_ray, const Plane& a_plane);
-std::optional<float> intersection(Ray& a_ray, const Ellipsoid& a_sphere);
-std::optional<float> intersection(Ray& a_ray, const Box& a_box);
-std::optional<float> intersection(Ray& a_ray, const Shape& a_object);
-std::pair<std::optional<float>, Color> raytrace(Ray& a_ray, const Scene& a_scene);
+Ray generate_ray(const Scene& scene, std::pair<std::uint32_t, std::uint32_t> pixel_coord);
+std::optional<Intersection> intersection(Ray& ray, Plane* plane);
+std::optional<Intersection> intersection(Ray& ray, Ellipsoid* sphere);
+std::optional<Intersection> intersection(Ray& ray, Box* box);
+std::optional<Intersection> intersection(Ray ray, Shape* object);
+std::pair<std::optional<float>, glm::vec3> raytrace(Ray& ray, const Scene& scene, std::uint32_t ray_depth);
 
-} // namespace ray
+bool is_shadowed(const Scene& scene, const Ray& ray, float dist);
+glm::vec3 calc_color(const Scene& scene, Shape* obj, Ray ray, const Intersection& inter, std::uint32_t ray_depth);
+glm::vec3 calc_diffuse_rawcolor(const Scene& scene, Shape* obj, const glm::vec3& inter_point, const Intersection& inter);
+glm::vec3 calc_metallic_rawcolor(const Scene& scene, Shape* obj, Ray ray, const Intersection& inter, std::uint32_t ray_depth);
+glm::vec3 calc_dielectric_rawcolor(const Scene& scene, Shape* obj, Ray ray, const Intersection& inter, std::uint32_t ray_depth);
+
+} // namespace engine::ray
