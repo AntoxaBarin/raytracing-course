@@ -1,5 +1,9 @@
 # raytracing-course
 
+## Light, materials
+
+![](./images/scene_2.png)
+
 ### Build
 
 ```bash
