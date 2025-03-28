@@ -173,37 +173,9 @@ bool is_shadowed(const Scene& scene, const Ray& ray, float dist) {
 }
 
 glm::vec3 calc_diffuse_rawcolor(const Scene& scene, Shape* obj, const glm::vec3& inter_point, const Intersection& inter) {
-    glm::vec3 result_color = scene.ambient_light * obj->color; 
+    glm::vec3 result_color = obj->color;
     float eps = 1e-4;
-    for (Light* light : scene.lights) {
-        float dist = std::numeric_limits<float>::min();
-        if (light->type == LIGHT_TYPE::Directed) {
-            Ray ray{};
-            ray.direction = light->direction;
-            ray.start = inter_point;
-
-            ray.start += ray.direction * eps;
-            float dot_product = glm::dot(ray.direction, inter.normal);
-            if (dot_product > 0 && !is_shadowed(scene, ray, dist)) {
-                result_color += obj->color * dot_product * light->intensity;
-            }
-        }
-        else if (light->type == LIGHT_TYPE::Point) {
-            Ray ray{};
-            ray.direction = glm::normalize(light->position - inter_point);
-            ray.start = inter_point;
-
-            dist = glm::distance(light->position, inter_point);
-            glm::vec3 attenuated_intensity =
-                light->intensity / (light->attenuation.x + light->attenuation.y * dist + light->attenuation.z * dist * dist);
-
-            ray.start += ray.direction * eps;
-            float dot_product = glm::dot(ray.direction, inter.normal);
-            if (dot_product > 0 && !is_shadowed(scene, ray, dist)) {
-                result_color += obj->color * dot_product * attenuated_intensity;
-            }
-        }
-    }
+    /* warning: dummy implementation */
     return result_color;
 }
 

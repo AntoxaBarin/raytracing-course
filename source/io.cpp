@@ -53,31 +53,6 @@ Scene load_scene(const std::string& path) {
         else if (command == "SAMPLES") {
             ss >> scene.samples;
         }
-        else if (command == "AMBIENT_LIGHT") {
-            ss >> scene.ambient_light.r >> scene.ambient_light.g >> scene.ambient_light.b;
-        }
-        else if (command == "NEW_LIGHT") {
-            Light* new_light = new Light();
-            scene.lights.push_back(new_light);
-        }
-        else if (command == "LIGHT_INTENSITY") {
-            auto light = scene.lights.back();
-            ss >> light->intensity.r >> light->intensity.g >> light->intensity.b;
-        }
-        else if (command == "LIGHT_DIRECTION") {
-            auto light = scene.lights.back();
-            ss >> light->direction.x >> light->direction.y >> light->direction.z;
-            light->direction = glm::normalize(light->direction);
-            light->type = LIGHT_TYPE::Directed;
-        }
-        else if (command == "LIGHT_POSITION") {
-            auto light = scene.lights.back();
-            ss >> light->position.x >> light->position.y >> light->position.z;
-        }
-        else if (command == "LIGHT_ATTENUATION") {
-            auto light = scene.lights.back();
-            ss >> light->attenuation.x >> light->attenuation.y >> light->attenuation.z;
-        }
         else if (command == "NEW_PRIMITIVE") {
             std::getline(in, line);
             std::stringstream ss(line);

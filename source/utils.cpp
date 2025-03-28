@@ -4,8 +4,8 @@
 #include "glm/exponential.hpp"
 #include "glm/vec3.hpp"
 
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 
 namespace engine {
 
