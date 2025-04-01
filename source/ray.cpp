@@ -14,8 +14,8 @@ Ray generate_ray(const Scene& scene, std::pair<std::uint32_t, std::uint32_t> pix
     Ray ray{};
     ray.start = scene.camera.camera_position;
 
-    float x = static_cast<float>(pixel_coord.first) + 0.5;
-    float y = static_cast<float>(pixel_coord.second) + 0.5;
+    float x = static_cast<float>(pixel_coord.first) + rand_uniform01();
+    float y = static_cast<float>(pixel_coord.second) + rand_uniform01();
 
     x = (2.f * x / static_cast<float>(scene.width) - 1) * tanf(scene.camera.camera_fov_x / 2);
     y = -(2.f * y / static_cast<float>(scene.height) - 1) *
@@ -213,7 +213,7 @@ glm::vec3 calc_dielectric_rawcolor(const Scene& scene, Shape* obj, Ray in_ray, c
     float reflected_light = reflection_coef + (1 - reflection_coef) * std::pow(1 - cos_theta1, 5);
     float sin_theta2 = (air_ior / obj_ior) * sqrt(1 - cos_theta1 * cos_theta1);
 
-    float coin_toss = rand_uniform(0, 1);
+    float coin_toss = rand_uniform01();
     if (std::abs(sin_theta2) > 1 || coin_toss < reflection_coef) {
         Ray reflected_ray{};
         reflected_ray.direction = in_ray.direction - 2.f * inter.normal * glm::dot(inter.normal, in_ray.direction);

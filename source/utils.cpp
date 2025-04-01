@@ -29,10 +29,8 @@ std::uint8_t color_converter(float in) {
 static std::random_device rd;
 static std::minstd_rand gen(rd());
 
-float rand_uniform(float a, float b) {
+float rand_uniform01() {
     static std::uniform_real_distribution<> rnd(0, 1);
-    std::uniform_real_distribution<>::param_type bounds(a, b);
-    rnd.param(bounds);
     return rnd(gen);
 }
 
