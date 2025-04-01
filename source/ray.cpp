@@ -254,23 +254,29 @@ glm::vec3 calc_color(const Scene& scene, Shape* obj, Ray ray, const Intersection
 
 std::pair<std::optional<float>, glm::vec3> raytrace(Ray& ray, const Scene& scene, std::uint32_t ray_depth) {
     glm::vec3 color = scene.bg_color;
-    std::optional<float> intersection_t = std::nullopt;
+    std::optional<float> inter_t{std::nullopt};
+    std::optional<Intersection> closest_inter{std::nullopt};
+    Shape* closest_primitive = nullptr;
+
     if (ray_depth == scene.ray_depth) {
-        return {intersection_t, color};
+        return {inter_t, color};
     }
 
     for (auto primitive : scene.primitives) {
-        auto intersection_result = intersection(ray, primitive);
-        if (!intersection_result.has_value()) {
+        auto cur_inter = intersection(ray, primitive);
+        if (!cur_inter.has_value()) {
             continue;
         }
-        if (!intersection_t.has_value() || intersection_t.value() > intersection_result->t) {
-            intersection_t = intersection_result->t;
-            glm::vec3 inter_point = ray.start + ray.direction * intersection_result->t;
-            color = calc_color(scene, primitive, ray, intersection_result.value(), ray_depth);
+        if (!inter_t.has_value() || inter_t.value() > cur_inter->t) {
+            inter_t = cur_inter->t;
+            closest_inter = cur_inter;
+            closest_primitive = primitive;
         }
     }
-    return {intersection_t, color};
+    if (closest_inter.has_value()) {
+        color = calc_color(scene, closest_primitive, ray, closest_inter.value(), ray_depth);
+    }
+    return {inter_t, color};
 }
 
 } // namespace engine::ray
