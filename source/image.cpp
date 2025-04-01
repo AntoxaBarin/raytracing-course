@@ -6,11 +6,11 @@
 
 namespace engine {
 
-Image generate_image_multithread(const Scene& scene);
+Image generate_image_multithreaded(const Scene& scene);
 
-Image generate_image(const Scene& scene, bool multithread) {
-    if (multithread) {
-        return generate_image_multithread(scene);
+Image generate_image(const Scene& scene, bool multithreaded) {
+    if (multithreaded) {
+        return generate_image_multithreaded(scene);
     }
     Image result{};
     result.resize(scene.height * scene.width * 3);
@@ -36,7 +36,7 @@ Image generate_image(const Scene& scene, bool multithread) {
     return result;
 }
 
-Image generate_image_multithread(const Scene& scene) {
+Image generate_image_multithreaded(const Scene& scene) {
     Image result{};
     result.resize(scene.height * scene.width * 3);
 

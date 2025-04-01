@@ -5,7 +5,7 @@
 #include "io.hpp"
 
 static bool verbose = false;
-static bool multithread = false;
+static bool multithreaded = false;
 
 int main(int argc, char* argv[]) {
     if (argc < 3 || argc > 5) {
@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
                 verbose = true;
             }
             else if (std::string(argv[i]) == "-thread") {
-                multithread = true;
+                multithreaded = true;
             }
             else {
                 std::cout << "Unknown argument: " << argv[i] << '\n';
@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
         if (verbose) {
             std::cout << scene << '\n';
         }
-        engine::Image image = engine::generate_image(scene, multithread);
+        engine::Image image = engine::generate_image(scene, multithreaded);
         engine::io::write_image(std::string(argv[2]), scene.width, scene.height, image);
     }
     catch (const std::runtime_error& e) {
