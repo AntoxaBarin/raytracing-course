@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <random>
 
 namespace engine {
 
@@ -23,6 +24,21 @@ std::uint8_t color_converter(float in) {
     in = tone_map(in);
     in = std::pow(in, 1.0 / 2.2);
     return std::round(std::clamp(in * 255, 0.f, 255.f));
+}
+
+static std::random_device rd;
+static std::minstd_rand gen(rd());
+
+float rand_uniform(float a, float b) {
+    static std::uniform_real_distribution<> rnd(0, 1);
+    std::uniform_real_distribution<>::param_type bounds(a, b);
+    rnd.param(bounds);
+    return rnd(gen);
+}
+
+float rand_normal01() {
+    static std::normal_distribution<> rnd(0, 1);
+    return rnd(gen);
 }
 
 } // namespace engine

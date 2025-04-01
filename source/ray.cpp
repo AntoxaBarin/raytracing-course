@@ -1,6 +1,7 @@
 #include "ray.hpp"
 #include "glm/geometric.hpp"
 #include "primitive.hpp"
+#include "utils.hpp"
 
 #include <cmath>
 #include <limits>
@@ -172,62 +173,75 @@ bool is_shadowed(const Scene& scene, const Ray& ray, float dist) {
     return false;
 }
 
-glm::vec3 calc_diffuse_rawcolor(const Scene& scene, Shape* obj, const glm::vec3& inter_point, const Intersection& inter) {
+glm::vec3 calc_diffuse_rawcolor(const Scene& scene, Shape* obj, Ray in_ray, const Intersection& inter, std::uint32_t ray_depth) {
     glm::vec3 result_color = obj->color;
     float eps = 1e-4;
-    /* warning: dummy implementation */
-    return result_color;
+    glm::vec3 inter_point = in_ray.start + in_ray.direction * inter.t;
+    Ray out_ray{};
+    out_ray.direction = glm::normalize(glm::vec3{rand_normal01(), rand_normal01(), rand_normal01()});
+    if (glm::dot(out_ray.direction, inter.normal) < 0) {
+        out_ray.direction *= -1;
+    }
+    out_ray.start = inter_point + out_ray.direction * eps;
+
+    glm::vec3 color = raytrace(out_ray, scene, ray_depth + 1).second;
+    return obj->emission + 2.f * obj->color * color * glm::dot(out_ray.direction, inter.normal);
 }
 
-glm::vec3 calc_metallic_rawcolor(const Scene& scene, Shape* obj, Ray ray, const Intersection& inter, std::uint32_t ray_depth) {
+glm::vec3 calc_metallic_rawcolor(const Scene& scene, Shape* obj, Ray in_ray, const Intersection& inter, std::uint32_t ray_depth) {
     float eps = 1e-4;
-    glm::vec3 inter_point = ray.start + ray.direction * inter.t;
+    glm::vec3 inter_point = in_ray.start + in_ray.direction * inter.t;
     Ray reflected_ray{};
-    reflected_ray.direction = ray.direction - 2.f * inter.normal * glm::dot(inter.normal, ray.direction);
+    reflected_ray.direction = in_ray.direction - 2.f * inter.normal * glm::dot(inter.normal, in_ray.direction);
     reflected_ray.start = inter_point + reflected_ray.direction * eps;
 
     auto next_raytrace = raytrace(reflected_ray, scene, ray_depth + 1);
-    return obj->color * next_raytrace.second;
+    return obj->emission + obj->color * next_raytrace.second;
 }
 
-glm::vec3 calc_dielectric_rawcolor(const Scene& scene, Shape* obj, Ray ray, const Intersection& inter, std::uint32_t ray_depth) {
+glm::vec3 calc_dielectric_rawcolor(const Scene& scene, Shape* obj, Ray in_ray, const Intersection& inter, std::uint32_t ray_depth) {
     float eps = 1e-4;
-    glm::vec3 inter_point = ray.start + ray.direction * inter.t;
-    Ray reflected_ray{};
-    reflected_ray.direction = ray.direction - 2.f * inter.normal * glm::dot(inter.normal, ray.direction);
-    reflected_ray.start = inter_point + reflected_ray.direction * eps;
-    glm::vec3 reflected_color = raytrace(reflected_ray, scene, ray_depth + 1).second;
+    glm::vec3 inter_point = in_ray.start + in_ray.direction * inter.t;
 
-    float cos_theta1 = glm::dot(-ray.direction, inter.normal);
+    float cos_theta1 = glm::dot(-in_ray.direction, inter.normal);
     float air_ior = 1.f;
     float obj_ior = obj->ior;
     if (inter.inside) {
         std::swap(air_ior, obj_ior);
     }
-
+    float reflection_coef = std::pow((air_ior - obj_ior) / (air_ior + obj_ior), 2);
+    float reflected_light = reflection_coef + (1 - reflection_coef) * std::pow(1 - cos_theta1, 5);
     float sin_theta2 = (air_ior / obj_ior) * sqrt(1 - cos_theta1 * cos_theta1);
-    if (std::abs(sin_theta2) > 1) {
-        return reflected_color;
+
+    float coin_toss = rand_uniform(0, 1);
+    if (std::abs(sin_theta2) > 1 || coin_toss < reflection_coef) {
+        Ray reflected_ray{};
+        reflected_ray.direction = in_ray.direction - 2.f * inter.normal * glm::dot(inter.normal, in_ray.direction);
+        reflected_ray.start = inter_point + reflected_ray.direction * eps;
+        glm::vec3 reflected_color = raytrace(reflected_ray, scene, ray_depth + 1).second;
+
+        if (inter.inside) {
+            return reflected_color;
+        }
+        return obj->emission + reflected_color;
     }
+
     float cos_theta2 = sqrt(1 - sin_theta2 * sin_theta2);
     Ray refracted_ray{};
-    refracted_ray.direction = (air_ior / obj_ior) * ray.direction + (air_ior / obj_ior * cos_theta1 - cos_theta2) * inter.normal;
+    refracted_ray.direction = (air_ior / obj_ior) * in_ray.direction + (air_ior / obj_ior * cos_theta1 - cos_theta2) * inter.normal;
     refracted_ray.start = inter_point + refracted_ray.direction * eps;
     glm::vec3 refracted_color = raytrace(refracted_ray, scene, ray_depth + 1).second;
 
-    float reflection_coef = std::pow((air_ior - obj_ior) / (air_ior + obj_ior), 2);
-    float reflected_light = reflection_coef + (1 - reflection_coef) * std::pow(1 - cos_theta1, 5);
-
     if (inter.inside) {
-        return reflected_light * reflected_color + (1 - reflected_light) * refracted_color;
+        return refracted_color;
     }
-    return reflected_light * reflected_color + (1 - reflected_light) * refracted_color * obj->color;
+    return obj->emission + refracted_color * obj->color;
 }
 
 glm::vec3 calc_color(const Scene& scene, Shape* obj, Ray ray, const Intersection& inter, std::uint32_t ray_depth) {
     switch (obj->material) {
     case MATERIAL_TYPE::Diffuse:
-        return calc_diffuse_rawcolor(scene, obj, ray.start + ray.direction * inter.t, inter);
+        return calc_diffuse_rawcolor(scene, obj, ray, inter, ray_depth);
     case MATERIAL_TYPE::Metallic:
         return calc_metallic_rawcolor(scene, obj, ray, inter, ray_depth);
     case MATERIAL_TYPE::Dielectric:
