@@ -8,6 +8,6 @@
 namespace engine {
 
 using Image = std::vector<std::uint8_t>;
-Image generate_image(const Scene& scene);
+Image generate_image(const Scene& scene, bool multithread);
 
 } // namespace engine

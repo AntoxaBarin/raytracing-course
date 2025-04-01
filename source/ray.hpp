@@ -14,10 +14,9 @@ namespace engine::ray {
 using Color = std::array<std::uint8_t, 3>;
 
 struct Ray {
-    Ray() {
-        start = {0.f, 0.f, 0.f};
-        direction = {0.f, 0.f, 0.f};
-    }
+    Ray()
+        : start({0.f, 0.f, 0.f}),
+          direction({0.f, 0.f, 0.f}) {}
 
     glm::vec3 start;
     glm::vec3 direction;
@@ -32,7 +31,7 @@ std::pair<std::optional<float>, glm::vec3> raytrace(Ray& ray, const Scene& scene
 
 bool is_shadowed(const Scene& scene, const Ray& ray, float dist);
 glm::vec3 calc_color(const Scene& scene, Shape* obj, Ray ray, const Intersection& inter, std::uint32_t ray_depth);
-glm::vec3 calc_diffuse_rawcolor(const Scene& scene, Shape* obj, const glm::vec3& inter_point, const Intersection& inter);
+glm::vec3 calc_diffuse_rawcolor(const Scene& scene, Shape* obj, Ray ray, const Intersection& inter, std::uint32_t ray_depth);
 glm::vec3 calc_metallic_rawcolor(const Scene& scene, Shape* obj, Ray ray, const Intersection& inter, std::uint32_t ray_depth);
 glm::vec3 calc_dielectric_rawcolor(const Scene& scene, Shape* obj, Ray ray, const Intersection& inter, std::uint32_t ray_depth);
 

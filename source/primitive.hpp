@@ -18,6 +18,7 @@ struct Shape {
     glm::quat rotation;
     PRIMITIVE_TYPE type;
     MATERIAL_TYPE material;
+    glm::vec3 emission;
     float ior;
 
     virtual ~Shape() = default;

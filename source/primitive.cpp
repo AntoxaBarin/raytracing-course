@@ -8,6 +8,7 @@ Shape::Shape(PRIMITIVE_TYPE type)
       position({0.f, 0.f, 0.f}),
       rotation({1.f, 0.f, 0.f, 0.f}),
       material(MATERIAL_TYPE::Diffuse),
+      emission(0.f, 0.f, 0.f),
       ior(1.f) {}
 
 Plane::Plane()

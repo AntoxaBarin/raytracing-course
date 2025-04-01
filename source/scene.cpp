@@ -9,15 +9,11 @@ Scene::~Scene() {
     for (Shape* primitive : primitives) {
         delete primitive;
     }
-    for (Light* light : lights) {
-        delete light;
-    }
 }
 
 std::ostream& operator<<(std::ostream& out, const Scene& scene) {
     out << "H: " << scene.height << " W: " << scene.width << '\n'
         << "BG_COLOR (R G B): " << scene.bg_color.r << ' ' << scene.bg_color.g << ' ' << scene.bg_color.b << '\n'
-        << "AMBIENT_LIGHT (R G B): " << scene.ambient_light.r << ' ' << scene.ambient_light.g << ' ' << scene.ambient_light.b << "\n\n"
         << "RAY_DEPTH: " << scene.ray_depth << '\n'
         << "CAMERA:\nFOV_X: " << scene.camera.camera_fov_x << '\n'
         << "POSITION: " << scene.camera.camera_position.x << ' ' << scene.camera.camera_position.y << ' ' << scene.camera.camera_position.z
@@ -59,14 +55,6 @@ std::ostream& operator<<(std::ostream& out, const Scene& scene) {
         else {
             throw std::runtime_error("Unknown material type.");
         }
-    }
-
-    for (auto light : scene.lights) {
-        out << "Light:\n"
-            << "Intensity: " << light->intensity.r << ' ' << light->intensity.g << ' ' << light->intensity.b << '\n'
-            << "Direction: " << light->direction.x << ' ' << light->direction.y << ' ' << light->direction.z << '\n'
-            << "Position: " << light->position.x << ' ' << light->position.y << ' ' << light->position.z << '\n'
-            << "Attenuation: " << light->attenuation.x << ' ' << light->attenuation.y << ' ' << light->attenuation.z << "\n\n";
     }
 
     return out;

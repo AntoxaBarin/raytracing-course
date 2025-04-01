@@ -22,11 +22,10 @@ struct Scene {
     std::uint32_t height;
     std::uint32_t width;
     glm::vec3 bg_color;
-    glm::vec3 ambient_light;
     Camera camera;
     std::uint32_t ray_depth;
+    std::uint32_t samples;
     std::vector<Shape*> primitives;
-    std::vector<Light*> lights;
 
     ~Scene();
 };
