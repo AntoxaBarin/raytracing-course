@@ -17,8 +17,8 @@ public:
     }
 
     std::minstd_rand& gen() {
-        static std::random_device rd;
-        static std::minstd_rand gen(rd());
+        thread_local std::random_device rd;
+        thread_local std::minstd_rand gen(rd());
         return gen;
     }
 
