@@ -119,8 +119,7 @@ glm::vec3 Light::box_sample(glm::vec3 x, glm::vec3 n) {
     float weight_z = box->size.x * box->size.y;
     float weight_sum = weight_x + weight_y + weight_z;
 
-    while (true) {
-        float u = Rng::get_instance().uniform_01();
+    float u = Rng::get_instance().uniform_01();
         float norm_u = u * weight_sum;
         
         float coin_toss = Rng::get_instance().uniform_01();
@@ -147,11 +146,7 @@ glm::vec3 Light::box_sample(glm::vec3 x, glm::vec3 n) {
         ray::Ray r;
         r.start = x;
         r.direction = glm::normalize(point - x);
-    
-        if (ray::intersection(r, box).has_value()) {
-            return glm::normalize(point - x);
-        }
-    }
+        return glm::normalize(point - x);
 }
 
 float Light::ellips_pdf(glm::vec3 x, glm::vec3 d, glm::vec3 inter_point, glm::vec3 inter_norm) {
@@ -183,23 +178,18 @@ glm::vec3 Light::ellips_sample(glm::vec3 x, glm::vec3 n) {
         throw std::runtime_error("Failed to cast shape to Ellipsoid");
     }
 
-    while (true) {
-        glm::vec3 point = glm::normalize(glm::vec3(
-            Rng::get_instance().normal_01(),
-            Rng::get_instance().normal_01(),
-            Rng::get_instance().normal_01()
-        ));
-        point *= ellips->radius;
-        point = ellips->rotation * point + ellips->position;
+    glm::vec3 point = glm::normalize(glm::vec3(
+        Rng::get_instance().normal_01(),
+        Rng::get_instance().normal_01(),
+        Rng::get_instance().normal_01()
+    ));
+    point *= ellips->radius;
+    point = ellips->rotation * point + ellips->position;
 
-        ray::Ray r;
-        r.start = x;
-        r.direction = glm::normalize(point - x);
-
-        if (ray::intersection(r, ellips).has_value()) {
-            return glm::normalize(point - x);
-        }
-    }    
+    ray::Ray r;
+    r.start = x;
+    r.direction = glm::normalize(point - x);
+    return glm::normalize(point - x);
 }
 
 Mix::Mix(std::vector<std::unique_ptr<IDistribution>>&& distrs) : distrs(std::move(distrs)) {}
