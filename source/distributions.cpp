@@ -103,7 +103,7 @@ float Light::box_pdf(glm::vec3 x, glm::vec3 d, glm::vec3 inter_point, glm::vec3 
     if (box == nullptr) {
         throw std::runtime_error("Failed to cast shape to Box");
     }
-    auto numer = glm::dot(x - inter_norm, x - inter_norm);
+    auto numer = glm::dot(x - inter_point, x - inter_point);
     auto denom = 8 * (box->size.y * box->size.z + box->size.x * box->size.z + box->size.x * box->size.y) * std::abs(glm::dot(d, inter_norm));
     return numer / denom;
 }
