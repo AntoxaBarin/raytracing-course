@@ -42,7 +42,8 @@ Image generate_image_multithread(const Scene& scene) {
     result.resize(scene.height * scene.width * 3);
 
     const std::size_t total_pixels = scene.height * scene.width;
-    const std::size_t threads_num = std::max(4u, std::thread::hardware_concurrency());
+    //const std::size_t threads_num = std::max(4u, std::thread::hardware_concurrency());
+    const std::size_t threads_num = 4u;
     std::vector<std::thread> threads;
     threads.reserve(threads_num);
 
