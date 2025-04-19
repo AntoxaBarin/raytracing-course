@@ -43,7 +43,6 @@ glm::vec3 Cosine::sample(glm::vec3 x, glm::vec3 n) {
     };
     sample = glm::normalize(sample);
     sample += n;
-    // if (len < eps ...)
     return 1.f / glm::length(sample) * sample;
 }
 
@@ -143,9 +142,6 @@ glm::vec3 Light::box_sample(glm::vec3 x, glm::vec3 n) {
         point = obj->rotation * point;
         point += obj->position;
 
-        ray::Ray r;
-        r.start = x;
-        r.direction = glm::normalize(point - x);
         return glm::normalize(point - x);
 }
 
@@ -186,9 +182,6 @@ glm::vec3 Light::ellips_sample(glm::vec3 x, glm::vec3 n) {
     point *= ellips->radius;
     point = ellips->rotation * point + ellips->position;
 
-    ray::Ray r;
-    r.start = x;
-    r.direction = glm::normalize(point - x);
     return glm::normalize(point - x);
 }
 
