@@ -48,7 +48,7 @@ glm::vec3 Cosine::sample(glm::vec3 x, glm::vec3 n) {
 }
 
 float Cosine::pdf(glm::vec3 x, glm::vec3 n, glm::vec3 d) {
-    return std::max(0.f, glm::dot(d, d) / pi);
+    return std::max(0.f, glm::dot(d, n) / pi);
 }
 
 Light::Light(Shape* obj) : obj(obj) {}
