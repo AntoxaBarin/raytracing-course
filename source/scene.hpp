@@ -1,5 +1,6 @@
 #pragma once
 
+#include "distributions.hpp"
 #include "glm/vec3.hpp"
 
 #include "primitive.hpp"
@@ -7,6 +8,7 @@
 #include <cstdint>
 #include <iostream>
 #include <vector>
+#include <memory>
 
 namespace engine {
 
@@ -26,6 +28,9 @@ struct Scene {
     std::uint32_t ray_depth;
     std::uint32_t samples;
     std::vector<Shape*> primitives;
+    rand::Mix* distribution;
+
+    void init_light_distrs();
 
     ~Scene();
 };

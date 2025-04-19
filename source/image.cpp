@@ -12,6 +12,7 @@ Image generate_image(const Scene& scene, bool multithread) {
     if (multithread) {
         return generate_image_multithread(scene);
     }
+    
     Image result{};
     result.resize(scene.height * scene.width * 3);
 
