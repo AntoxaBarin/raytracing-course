@@ -25,6 +25,8 @@ set(SOURCE
     source/ray.cpp
     source/utils.hpp
     source/utils.cpp
+    source/distributions.hpp
+    source/distributions.cpp
 )
 
 add_executable(${TARGET_NAME} ${SOURCE})

@@ -29,7 +29,6 @@ std::optional<Intersection> intersection(Ray& ray, Box* box);
 std::optional<Intersection> intersection(Ray ray, Shape* object);
 std::pair<std::optional<float>, glm::vec3> raytrace(Ray& ray, const Scene& scene, std::uint32_t ray_depth);
 
-bool is_shadowed(const Scene& scene, const Ray& ray, float dist);
 glm::vec3 calc_color(const Scene& scene, Shape* obj, Ray ray, const Intersection& inter, std::uint32_t ray_depth);
 glm::vec3 calc_diffuse_rawcolor(const Scene& scene, Shape* obj, Ray ray, const Intersection& inter, std::uint32_t ray_depth);
 glm::vec3 calc_metallic_rawcolor(const Scene& scene, Shape* obj, Ray ray, const Intersection& inter, std::uint32_t ray_depth);

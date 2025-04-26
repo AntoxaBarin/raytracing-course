@@ -1,6 +1,6 @@
 BasedOnStyle: LLVM
 IndentWidth: 4
-ColumnLimit: 140
+ColumnLimit: 120
 UseTab: Never
 BinPackArguments: false
 BinPackParameters: false
@@ -22,3 +22,4 @@ BraceWrapping:
   SplitEmptyFunction: false
   SplitEmptyRecord: false
   SplitEmptyNamespace: false
+AccessModifierOffset: -4

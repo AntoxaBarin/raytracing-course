@@ -2,6 +2,7 @@
 #include "glm/geometric.hpp"
 #include "primitive.hpp"
 #include "utils.hpp"
+#include "distributions.hpp"
 
 #include <cmath>
 #include <limits>
@@ -163,29 +164,26 @@ std::optional<Intersection> intersection(Ray ray, Shape* object) {
     return inter;
 }
 
-bool is_shadowed(const Scene& scene, const Ray& ray, float dist) {
-    for (Shape* primitive : scene.primitives) {
-        std::optional<Intersection> inter = intersection(ray, primitive);
-        if (inter.has_value() && (dist > inter->t || dist == std::numeric_limits<float>::min())) {
-            return true;
-        }
-    }
-    return false;
-}
-
 glm::vec3 calc_diffuse_rawcolor(const Scene& scene, Shape* obj, Ray in_ray, const Intersection& inter, std::uint32_t ray_depth) {
     glm::vec3 result_color = obj->color;
     float eps = 1e-4;
     glm::vec3 inter_point = in_ray.start + in_ray.direction * inter.t;
+
+    auto rnd_dir = scene.distribution->sample(inter_point + eps * inter.normal, inter.normal);
+    if (glm::dot(rnd_dir, inter.normal) < 0) {
+        return obj->emission;
+    }
+    float pdf = scene.distribution->pdf(inter_point + eps * inter.normal, inter.normal, rnd_dir);
+
     Ray out_ray{};
-    out_ray.direction = glm::normalize(glm::vec3{rand_normal01(), rand_normal01(), rand_normal01()});
+    out_ray.direction = glm::normalize(rnd_dir);
     if (glm::dot(out_ray.direction, inter.normal) < 0) {
         out_ray.direction *= -1;
     }
     out_ray.start = inter_point + out_ray.direction * eps;
 
     glm::vec3 color = raytrace(out_ray, scene, ray_depth + 1).second;
-    return obj->emission + 2.f * obj->color * color * glm::dot(out_ray.direction, inter.normal);
+    return obj->emission + (1.f / pdf) * obj->color / rand::pi * color * glm::dot(out_ray.direction, inter.normal);
 }
 
 glm::vec3 calc_metallic_rawcolor(const Scene& scene, Shape* obj, Ray in_ray, const Intersection& inter, std::uint32_t ray_depth) {
