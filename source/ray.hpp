@@ -23,9 +23,6 @@ struct Ray {
 };
 
 Ray generate_ray(const Scene& scene, std::pair<std::uint32_t, std::uint32_t> pixel_coord);
-std::optional<Intersection> intersection(Ray& ray, Plane* plane);
-std::optional<Intersection> intersection(Ray& ray, Ellipsoid* sphere);
-std::optional<Intersection> intersection(Ray& ray, Box* box);
 std::optional<Intersection> intersection(Ray ray, Shape* object);
 std::pair<std::optional<float>, glm::vec3> raytrace(Ray& ray, const Scene& scene, std::uint32_t ray_depth);
 

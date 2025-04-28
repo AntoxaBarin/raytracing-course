@@ -1,7 +1,7 @@
 #pragma once
 
-#include <optional>
 #include <iostream>
+#include <optional>
 
 #include "glm/gtc/quaternion.hpp"
 #include "glm/vec3.hpp"
@@ -9,9 +9,21 @@
 
 namespace engine {
 
+namespace ray {
+struct Ray;
+}
+
 enum class PRIMITIVE_TYPE { Plane, Ellipsoid, Box };
 enum class MATERIAL_TYPE { Metallic, Dielectric, Diffuse };
 enum class LIGHT_TYPE { Point, Directed };
+
+struct Intersection {
+    Intersection();
+
+    float t;
+    glm::vec3 normal;
+    bool inside;
+};
 
 struct Shape {
     Shape(PRIMITIVE_TYPE type);
@@ -25,22 +37,26 @@ struct Shape {
     float ior;
 
     virtual ~Shape() = default;
+    virtual std::optional<Intersection> intersection(ray::Ray& ray) const = 0;
 };
 
 struct Plane : Shape {
     Plane();
+    std::optional<Intersection> intersection(ray::Ray& ray) const final;
 
     glm::vec3 normal;
 };
 
 struct Ellipsoid : Shape {
     Ellipsoid();
+    std::optional<Intersection> intersection(ray::Ray& ray) const final;
 
     glm::vec3 radius;
 };
 
 struct Box : Shape {
     Box();
+    std::optional<Intersection> intersection(ray::Ray& ray) const final;
 
     glm::vec3 size;
 };
@@ -53,14 +69,6 @@ struct Light {
     glm::vec3 position;
     glm::vec3 attenuation;
     LIGHT_TYPE type;
-};
-
-struct Intersection {
-    Intersection();
-
-    float t;
-    glm::vec3 normal;
-    bool inside;
 };
 
 } // namespace engine

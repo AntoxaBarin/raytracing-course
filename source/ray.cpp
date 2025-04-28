@@ -5,7 +5,6 @@
 #include "distributions.hpp"
 
 #include <cmath>
-#include <limits>
 #include <optional>
 #include <stdexcept>
 
@@ -25,138 +24,13 @@ Ray generate_ray(const Scene& scene, std::pair<std::uint32_t, std::uint32_t> pix
     return ray;
 }
 
-std::optional<Intersection> intersection(Ray& ray, Plane* plane) {
-    Intersection inter{};
-    inter.t = -glm::dot(ray.start, plane->normal) / glm::dot(ray.direction, plane->normal);
-    if (inter.t < 0) {
-        return {};
-    }
-    inter.normal = plane->normal;
-    if (glm::dot(ray.direction, plane->normal) >= 0) {
-        inter.inside = true;
-        // inter.normal *= 1;
-    }
-    return inter;
-}
-
-std::optional<Intersection> intersection(Ray& ray, Ellipsoid* ellips) {
-    Intersection inter{};
-    inter.normal = glm::vec3(1.0f);
-    float a =
-        glm::dot(glm::vec3{ray.direction.x / ellips->radius.x, ray.direction.y / ellips->radius.y, ray.direction.z / ellips->radius.z},
-                 glm::vec3{ray.direction.x / ellips->radius.x, ray.direction.y / ellips->radius.y, ray.direction.z / ellips->radius.z});
-
-    float b =
-        glm::dot(glm::vec3{ray.start.x / ellips->radius.x, ray.start.y / ellips->radius.y, ray.start.z / ellips->radius.z},
-                 glm::vec3{ray.direction.x / ellips->radius.x, ray.direction.y / ellips->radius.y, ray.direction.z / ellips->radius.z});
-
-    float c = glm::dot(glm::vec3{ray.start.x / ellips->radius.x, ray.start.y / ellips->radius.y, ray.start.z / ellips->radius.z},
-                       glm::vec3{ray.start.x / ellips->radius.x, ray.start.y / ellips->radius.y, ray.start.z / ellips->radius.z});
-    --c;
-
-    float D = b * b - a * c;
-    if (D < 0) {
-        return {};
-    }
-    float t_1 = (-b - sqrt(D)) / a;
-    float t_2 = (-b + sqrt(D)) / a;
-    inter.t = t_1;
-    if (t_1 < 0) {
-        if (t_2 < 0) {
-            return {};
-        }
-        else {
-            inter.t = t_2;
-        }
-    }
-
-    glm::vec3 inter_point = ray.start + ray.direction * inter.t;
-    glm::vec3 inter_norm = glm::vec3(inter_point.x / (ellips->radius.x * ellips->radius.x),
-                                     inter_point.y / (ellips->radius.y * ellips->radius.y),
-                                     inter_point.z / (ellips->radius.z * ellips->radius.z));
-    inter.normal = glm::normalize(inter_norm);
-
-    if (glm::dot(ray.direction, inter.normal) >= 0) {
-        inter.inside = true;
-        inter.normal *= -1;
-    }
-    return inter;
-}
-
-std::optional<Intersection> intersection(Ray& ray, Box* box) {
-    Intersection inter{};
-    inter.normal = glm::vec3(1.0f);
-
-    float tx_1 = (box->size.x - ray.start.x) / ray.direction.x;
-    float tx_2 = (-box->size.x - ray.start.x) / ray.direction.x;
-    if (tx_2 < tx_1) {
-        std::swap(tx_1, tx_2);
-    }
-    float ty_1 = (box->size.y - ray.start.y) / ray.direction.y;
-    float ty_2 = (-box->size.y - ray.start.y) / ray.direction.y;
-    if (ty_2 < ty_1) {
-        std::swap(ty_1, ty_2);
-    }
-    float tz_1 = (box->size.z - ray.start.z) / ray.direction.z;
-    float tz_2 = (-box->size.z - ray.start.z) / ray.direction.z;
-    if (tz_2 < tz_1) {
-        std::swap(tz_1, tz_2);
-    }
-
-    float t_1 = std::max(tx_1, std::max(ty_1, tz_1));
-    float t_2 = std::min(tx_2, std::min(ty_2, tz_2));
-    inter.t = t_1;
-    if (t_1 > t_2) {
-        return {};
-    }
-    else if (t_2 < 0) {
-        return {};
-    }
-    else if (t_1 < 0) {
-        inter.t = t_2;
-    }
-
-    glm::vec3 inter_point = ray.start + ray.direction * inter.t;
-    glm::vec3 inter_norm = glm::vec3(inter_point.x / box->size.x, inter_point.y / box->size.y, inter_point.z / box->size.z);
-    float eps = 1e-3;
-    if (std::abs(std::abs(inter_norm.x) - 1) <= eps) {
-        inter.normal = {inter_norm.x, 0.f, 0.f};
-    }
-    else if (std::abs(std::abs(inter_norm.y) - 1) <= eps) {
-        inter.normal = {0.f, inter_norm.y, 0.f};
-    }
-    else {
-        inter.normal = {0.f, 0.f, inter_norm.z};
-    }
-
-    if (glm::dot(ray.direction, inter.normal) >= 0) {
-        inter.inside = true;
-        inter.normal *= -1;
-    }
-    return inter;
-}
-
 std::optional<Intersection> intersection(Ray ray, Shape* object) {
     ray.start -= object->position;
     glm::quat reversed_rotation = glm::inverse(object->rotation);
     ray.start = reversed_rotation * ray.start;
     ray.direction = glm::normalize(reversed_rotation * ray.direction);
 
-    std::optional<Intersection> inter = std::nullopt;
-    switch (object->type) {
-    case PRIMITIVE_TYPE::Plane:
-        inter = intersection(ray, dynamic_cast<Plane*>(object));
-        break;
-    case PRIMITIVE_TYPE::Ellipsoid:
-        inter = intersection(ray, dynamic_cast<Ellipsoid*>(object));
-        break;
-    case PRIMITIVE_TYPE::Box:
-        inter = intersection(ray, dynamic_cast<Box*>(object));
-        break;
-    default:
-        throw std::runtime_error("Unknown primitive type");
-    }
-
+    std::optional<Intersection> inter = object->intersection(ray);
     if (!inter.has_value()) {
         return {};
     }
