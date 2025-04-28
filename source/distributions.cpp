@@ -92,7 +92,7 @@ glm::vec3 Light::sample(glm::vec3 x, glm::vec3 n) {
             return box_sample(x, n);
         case PRIMITIVE_TYPE::Ellipsoid:
             return ellips_sample(x, n);
-        case PRIMITIVE_TYPE::Plane:
+        default:
             throw std::runtime_error("Cannot generate sample for Plane");    
     }
 }

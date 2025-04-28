@@ -12,7 +12,7 @@ namespace ray {
 struct Ray;
 }
 
-enum class PRIMITIVE_TYPE { Plane, Ellipsoid, Box };
+enum class PRIMITIVE_TYPE { Plane, Ellipsoid, Box, Triangle };
 enum class MATERIAL_TYPE { Metallic, Dielectric, Diffuse };
 
 struct Intersection {
@@ -57,6 +57,15 @@ struct Box : Shape {
     std::optional<Intersection> intersection(ray::Ray& ray) const final;
 
     glm::vec3 size;
+};
+
+struct Triangle : Shape {
+    Triangle();
+    std::optional<Intersection> intersection(ray::Ray& ray) const final;
+
+    glm::vec3 vertex_1;
+    glm::vec3 vertex_2;
+    glm::vec3 vertex_3;
 };
 
 } // namespace engine

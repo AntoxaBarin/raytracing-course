@@ -73,6 +73,13 @@ Scene load_scene(const std::string& path) {
                 ss >> new_box->size.x >> new_box->size.y >> new_box->size.z;
                 scene.primitives.push_back(new_box);
             }
+            else if (command == "TRIANGLE") {
+                Triangle* new_triangle = new Triangle();
+                ss >> new_triangle->vertex_1.x >> new_triangle->vertex_1.y >> new_triangle->vertex_1.z >>
+                    new_triangle->vertex_2.x >> new_triangle->vertex_2.y >> new_triangle->vertex_2.z >>
+                    new_triangle->vertex_3.x >> new_triangle->vertex_3.y >> new_triangle->vertex_3.z;
+                scene.primitives.push_back(new_triangle);
+            }
         }
         else if (command == "POSITION") {
             auto primitive = scene.primitives.back();

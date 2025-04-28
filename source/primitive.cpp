@@ -35,15 +35,13 @@ Ellipsoid::Ellipsoid()
       radius({0.f, 0.f, 0.f}) {}
 
 std::optional<Intersection> Ellipsoid::intersection(ray::Ray& ray) const {
-  Intersection inter{};
+    Intersection inter{};
     inter.normal = glm::vec3(1.0f);
-    float a =
-        glm::dot(glm::vec3{ray.direction.x / radius.x, ray.direction.y / radius.y, ray.direction.z / radius.z},
-                 glm::vec3{ray.direction.x / radius.x, ray.direction.y / radius.y, ray.direction.z / radius.z});
+    float a = glm::dot(glm::vec3{ray.direction.x / radius.x, ray.direction.y / radius.y, ray.direction.z / radius.z},
+                       glm::vec3{ray.direction.x / radius.x, ray.direction.y / radius.y, ray.direction.z / radius.z});
 
-    float b =
-        glm::dot(glm::vec3{ray.start.x / radius.x, ray.start.y / radius.y, ray.start.z / radius.z},
-                 glm::vec3{ray.direction.x / radius.x, ray.direction.y / radius.y, ray.direction.z / radius.z});
+    float b = glm::dot(glm::vec3{ray.start.x / radius.x, ray.start.y / radius.y, ray.start.z / radius.z},
+                       glm::vec3{ray.direction.x / radius.x, ray.direction.y / radius.y, ray.direction.z / radius.z});
 
     float c = glm::dot(glm::vec3{ray.start.x / radius.x, ray.start.y / radius.y, ray.start.z / radius.z},
                        glm::vec3{ray.start.x / radius.x, ray.start.y / radius.y, ray.start.z / radius.z});
@@ -134,6 +132,11 @@ std::optional<Intersection> Box::intersection(ray::Ray& ray) const {
     }
     return inter;
 }
+
+Triangle::Triangle()
+    : Shape(PRIMITIVE_TYPE::Triangle) {}
+
+std::optional<Intersection> Triangle::intersection(ray::Ray& ray) const { return {}; }
 
 Intersection::Intersection()
     : t(0.f),
