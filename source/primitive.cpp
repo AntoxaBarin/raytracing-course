@@ -2,8 +2,6 @@
 
 #include "ray.hpp"
 
-#include <iostream>
-
 namespace engine {
 
 Shape::Shape(PRIMITIVE_TYPE type)
@@ -136,13 +134,6 @@ std::optional<Intersection> Box::intersection(ray::Ray& ray) const {
     }
     return inter;
 }
-
-Light::Light()
-    : intensity({0.f, 0.f, 0.f}),
-      direction({0.f, 0.f, 0.f}),
-      position({0.f, 0.f, 0.f}),
-      attenuation({0.f, 0.f, 0.f}),
-      type(LIGHT_TYPE::Point) {}
 
 Intersection::Intersection()
     : t(0.f),

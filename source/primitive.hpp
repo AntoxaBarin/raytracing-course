@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include <optional>
 
 #include "glm/gtc/quaternion.hpp"
@@ -15,7 +14,6 @@ struct Ray;
 
 enum class PRIMITIVE_TYPE { Plane, Ellipsoid, Box };
 enum class MATERIAL_TYPE { Metallic, Dielectric, Diffuse };
-enum class LIGHT_TYPE { Point, Directed };
 
 struct Intersection {
     Intersection();
@@ -59,16 +57,6 @@ struct Box : Shape {
     std::optional<Intersection> intersection(ray::Ray& ray) const final;
 
     glm::vec3 size;
-};
-
-struct Light {
-    Light();
-
-    glm::vec3 intensity;
-    glm::vec3 direction;
-    glm::vec3 position;
-    glm::vec3 attenuation;
-    LIGHT_TYPE type;
 };
 
 } // namespace engine
