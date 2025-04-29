@@ -1,5 +1,7 @@
 #include "primitive.hpp"
 
+#include "glm/ext/matrix_float3x3.hpp"
+#include "glm/matrix.hpp"
 #include "ray.hpp"
 
 namespace engine {
@@ -136,7 +138,30 @@ std::optional<Intersection> Box::intersection(ray::Ray& ray) const {
 Triangle::Triangle()
     : Shape(PRIMITIVE_TYPE::Triangle) {}
 
-std::optional<Intersection> Triangle::intersection(ray::Ray& ray) const { return {}; }
+std::optional<Intersection> Triangle::intersection(ray::Ray& ray) const {
+    Intersection inter{};
+    glm::mat3 M = {
+        vertex_2 - vertex_1, 
+        vertex_3 - vertex_1, 
+        -ray.direction
+    };
+    glm::mat3 Minv = glm::inverse(glm::transpose(M));
+    glm::vec3 uvt = (ray.start - vertex_1) * Minv;
+
+    if (uvt.x < 0 || uvt.y < 0 || uvt.x + uvt.y > 1) {
+        return {};
+    }
+    if (uvt.z < 0) {
+        return {};
+    }
+    inter.t = uvt.z;
+    inter.normal = glm::normalize(glm::cross(vertex_2 - vertex_1, vertex_3 - vertex_1));
+    if (glm::dot(inter.normal, ray.direction) > 0) {
+        inter.inside = true;
+        inter.normal *= -1;
+    }
+    return inter;
+}
 
 Intersection::Intersection()
     : t(0.f),

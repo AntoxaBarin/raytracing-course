@@ -66,8 +66,11 @@ float Light::pdf(glm::vec3 x, glm::vec3 n, glm::vec3 d) {
     if (obj->type == PRIMITIVE_TYPE::Box) {
         result += box_pdf(x, d, x + inter->t * d, inter->normal);
     }
-    else {
+    else if (obj->type == PRIMITIVE_TYPE::Ellipsoid) {
         result += ellips_pdf(x, d, x + inter->t * d, inter->normal);
+    }
+    else if (obj->type == PRIMITIVE_TYPE::Triangle) {
+        result += triangle_pdf(x, d, x + inter->t * d, inter->normal);
     }
 
     r.start = x + (inter->t + eps) * d;
@@ -80,8 +83,11 @@ float Light::pdf(glm::vec3 x, glm::vec3 n, glm::vec3 d) {
     if (obj->type == PRIMITIVE_TYPE::Box) {
         result += box_pdf(x, d, x + (inter->t + next_inter->t + eps) * d, next_inter->normal);
     }
-    else {
+    else if (obj->type == PRIMITIVE_TYPE::Ellipsoid) {
         result += ellips_pdf(x, d, x + (inter->t + next_inter->t + eps) * d, next_inter->normal);
+    }
+    else if (obj->type == PRIMITIVE_TYPE::Triangle) {
+        result += triangle_pdf(x, d, x + (inter->t + next_inter->t + eps) * d, next_inter->normal);
     }
     return result;
 }
@@ -92,6 +98,8 @@ glm::vec3 Light::sample(glm::vec3 x, glm::vec3 n) {
             return box_sample(x, n);
         case PRIMITIVE_TYPE::Ellipsoid:
             return ellips_sample(x, n);
+        case PRIMITIVE_TYPE::Triangle:
+            return triangle_sample(x, n);    
         default:
             throw std::runtime_error("Cannot generate sample for Plane");    
     }
@@ -182,6 +190,38 @@ glm::vec3 Light::ellips_sample(glm::vec3 x, glm::vec3 n) {
     point *= ellips->radius;
     point = ellips->rotation * point + ellips->position;
 
+    return glm::normalize(point - x);
+}
+
+float Light::triangle_pdf(glm::vec3 x, glm::vec3 d, glm::vec3 inter_point, glm::vec3 inter_norm) {
+    auto triangle = dynamic_cast<Triangle*>(obj);
+    if (triangle == nullptr) {
+        throw std::runtime_error("Failed to cast shape to Triangle");
+    }
+    float square = 0.5f * glm::length(glm::cross(triangle->vertex_2 - triangle->vertex_1, 
+                                                 triangle->vertex_3 - triangle->vertex_1));
+    return 1 / square;
+}
+
+glm::vec3 Light::triangle_sample(glm::vec3 x, glm::vec3 n) {
+    auto triangle = dynamic_cast<Triangle*>(obj);
+    if (triangle == nullptr) {
+        throw std::runtime_error("Failed to cast shape to Triangle");
+    }
+
+    float u = Rng::get_instance().uniform_01();
+    float v = Rng::get_instance().uniform_01();
+    if (u + v > 1) {
+        u = 1 - u;
+        v = 1 - v;
+    }
+    
+    glm::vec3 a = triangle->vertex_1;
+    glm::vec3 b = triangle->vertex_2;
+    glm::vec3 c = triangle->vertex_3;
+
+    glm::vec3 point = a + (b - a) * u + (c - a) * v;
+    point = obj->rotation * point + obj->position;
     return glm::normalize(point - x);
 }
 

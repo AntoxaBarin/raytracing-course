@@ -88,6 +88,9 @@ public:
     float ellips_pdf(glm::vec3 x, glm::vec3 d, glm::vec3 inter_point, glm::vec3 inter_norm);
     glm::vec3 ellips_sample(glm::vec3 x, glm::vec3 n);
 
+    float triangle_pdf(glm::vec3 x, glm::vec3 d, glm::vec3 inter_point, glm::vec3 inter_norm);
+    glm::vec3 triangle_sample(glm::vec3 x, glm::vec3 n);
+
 private:
     Shape* obj;    
 };
