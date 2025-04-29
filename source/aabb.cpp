@@ -1,5 +1,7 @@
 #include "aabb.hpp"
+
 #include "primitive.hpp"
+
 #include <cassert>
 #include <stdexcept>
 
@@ -16,15 +18,15 @@ AABB::AABB(glm::vec3 min, glm::vec3 max)
 AABB::AABB(Shape* obj) {
     if (obj->type == PRIMITIVE_TYPE::Box) {
         auto b = dynamic_cast<Box*>(obj);
-        resize(b);
+        extend(b);
     }
     else if (obj->type == PRIMITIVE_TYPE::Ellipsoid) {
         auto e = dynamic_cast<Ellipsoid*>(obj);
-        resize(e);
+        extend(e);
     }
     else if (obj->type == PRIMITIVE_TYPE::Triangle) {
         auto t = dynamic_cast<Triangle*>(obj);
-        resize(t);
+        extend(t);
     }   
     else {
         throw std::runtime_error("AABB: Unsupported shape type");
@@ -40,20 +42,19 @@ AABB::AABB(Shape* obj) {
     min = rotation * glm::vec3(not_rotated_aabb.min);
     max = rotation * glm::vec3(not_rotated_aabb.min);
     
-    resize(rotation * glm::vec3(not_rotated_aabb.min.x, not_rotated_aabb.min.y, not_rotated_aabb.max.z));
-    resize(rotation * glm::vec3(not_rotated_aabb.min.x, not_rotated_aabb.max.y, not_rotated_aabb.min.z));
-    resize(rotation * glm::vec3(not_rotated_aabb.min.x, not_rotated_aabb.max.y, not_rotated_aabb.max.z));
-    resize(rotation * glm::vec3(not_rotated_aabb.max.x, not_rotated_aabb.min.y, not_rotated_aabb.min.z));
-    resize(rotation * glm::vec3(not_rotated_aabb.max.x, not_rotated_aabb.min.y, not_rotated_aabb.max.z));
-    resize(rotation * glm::vec3(not_rotated_aabb.max.x, not_rotated_aabb.max.y, not_rotated_aabb.min.z));
-    resize(rotation * glm::vec3(not_rotated_aabb.max.x, not_rotated_aabb.max.y, not_rotated_aabb.max.z));
+    extend(rotation * glm::vec3(not_rotated_aabb.min.x, not_rotated_aabb.min.y, not_rotated_aabb.max.z));
+    extend(rotation * glm::vec3(not_rotated_aabb.min.x, not_rotated_aabb.max.y, not_rotated_aabb.min.z));
+    extend(rotation * glm::vec3(not_rotated_aabb.min.x, not_rotated_aabb.max.y, not_rotated_aabb.max.z));
+    extend(rotation * glm::vec3(not_rotated_aabb.max.x, not_rotated_aabb.min.y, not_rotated_aabb.min.z));
+    extend(rotation * glm::vec3(not_rotated_aabb.max.x, not_rotated_aabb.min.y, not_rotated_aabb.max.z));
+    extend(rotation * glm::vec3(not_rotated_aabb.max.x, not_rotated_aabb.max.y, not_rotated_aabb.min.z));
+    extend(rotation * glm::vec3(not_rotated_aabb.max.x, not_rotated_aabb.max.y, not_rotated_aabb.max.z));
     
     min = min + obj->position;
     max = max + obj->position;
-
 }
 
-void AABB::resize(const glm::vec3& point) {
+void AABB::extend(const glm::vec3& point) {
     min.x = std::min(min.x, point.x);
     min.y = std::min(min.y, point.y);
     min.z = std::min(min.z, point.z);
@@ -62,21 +63,22 @@ void AABB::resize(const glm::vec3& point) {
     max.z = std::max(max.z, point.z);
 }
 
-void AABB::resize(Box* box) {
-    glm::vec3 box_min = -box->size;
-    glm::vec3 box_max = box->size;
-    min = glm::min(min, box_min);
-    max = glm::max(max, box_max);
+inline void AABB::extend(AABB aabb) {
+    min = glm::min(min, aabb.min);
+    max = glm::max(max, aabb.max);
 }
 
-void AABB::resize(Ellipsoid* ellips) {
-    glm::vec3 el_min = -ellips->radius;
-    glm::vec3 el_max = ellips->radius;
-    min = glm::min(min, el_min);
-    max = glm::max(max, el_max);
+inline void AABB::extend(Box* box) {
+    min = glm::min(min, -box->size);
+    max = glm::max(max, box->size);
+}
+
+inline void AABB::extend(Ellipsoid* ellips) {
+    min = glm::min(min, -ellips->radius);
+    max = glm::max(max, ellips->radius);
 }
     
-void AABB::resize(Triangle* triangle) {
+void AABB::extend(Triangle* triangle) {
     glm::vec3 a = triangle->vertex_1;
     glm::vec3 b = triangle->vertex_2;
     glm::vec3 c = triangle->vertex_3;
@@ -94,6 +96,13 @@ void AABB::resize(Triangle* triangle) {
 
     min = glm::min(min, tr_min);
     max = glm::max(max, tr_max);
+}
+
+float AABB::surface_area() const {
+    float x = max.x - min.x;
+    float y = max.y - min.y;
+    float z = max.z - min.z;
+    return 2.f * (x * y + x * z + y * z);
 }
 
 } // namespace engine
