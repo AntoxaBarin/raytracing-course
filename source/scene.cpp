@@ -23,6 +23,16 @@ void Scene::init_light_distrs() {
     distribution = new rand::Mix(std::move(mix_distrs));
 }
 
+void Scene::init_bvh() {
+    std::vector<Shape*> shapes;
+    for (auto primitive : primitives) {
+        if (primitive->type != PRIMITIVE_TYPE::Plane) {
+            shapes.push_back(primitive);
+        }
+    }
+    bvh = BVH(shapes, shapes.size());
+}
+
 Scene::~Scene() {
     for (Shape* primitive : primitives) {
         delete primitive;

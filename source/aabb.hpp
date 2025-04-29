@@ -12,6 +12,7 @@ struct AABB {
 
     void extend(const glm::vec3& point);
     void extend(AABB aabb);
+    void extend(Shape* obj);
     inline void extend(Box* box);
     inline void extend(Ellipsoid* ellips);
     inline void extend(Triangle* triangle);

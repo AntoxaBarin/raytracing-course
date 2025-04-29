@@ -68,6 +68,28 @@ inline void AABB::extend(AABB aabb) {
     max = glm::max(max, aabb.max);
 }
 
+void AABB::extend(Shape* obj) {
+    switch (obj->type) {
+        case PRIMITIVE_TYPE::Box: {
+            auto b = dynamic_cast<Box*>(obj);
+            extend(b);
+            break;
+        }
+        case PRIMITIVE_TYPE::Ellipsoid: {
+            auto e = dynamic_cast<Ellipsoid*>(obj);
+            extend(e);
+            break;
+        }
+        case PRIMITIVE_TYPE::Triangle: {
+            auto t = dynamic_cast<Triangle*>(obj);
+            extend(t);
+            break;
+        }
+        default:
+            throw std::runtime_error("AABB: Unsupported shape type");
+    }
+}
+
 inline void AABB::extend(Box* box) {
     min = glm::min(min, -box->size);
     max = glm::max(max, box->size);
