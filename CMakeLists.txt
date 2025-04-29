@@ -29,6 +29,8 @@ set(SOURCE
     source/distributions.cpp
     source/aabb.hpp
     source/aabb.cpp
+    source/bvh.hpp
+    source/bvh.cpp
 )
 
 add_executable(${TARGET_NAME} ${SOURCE})

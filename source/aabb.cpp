@@ -1,6 +1,7 @@
 #include "aabb.hpp"
 
 #include "primitive.hpp"
+#include "ray.hpp"
 
 #include <cassert>
 #include <stdexcept>
@@ -125,6 +126,65 @@ float AABB::surface_area() const {
     float y = max.y - min.y;
     float z = max.z - min.z;
     return 2.f * (x * y + x * z + y * z);
+}
+
+std::optional<Intersection> AABB::intersect(ray::Ray& ray) const {
+    auto s = 0.5f * (min + max);
+    ray::Ray shifted_ray = ray;
+    shifted_ray.start -= 0.5f * (min + max);
+
+    glm::vec3 ts1 = (-1.f * s - shifted_ray.start) / shifted_ray.direction;
+    glm::vec3 ts2 = (s - shifted_ray.start) / shifted_ray.direction;
+    float tx_1 = std::min(ts1.x, ts2.x); 
+    float tx_2 = std::max(ts1.x, ts2.x);
+    
+    float ty_1 = std::min(ts1.y, ts2.y); 
+    float ty_2 = std::max(ts1.y, ts2.y);
+    
+    float tz_1 = std::min(ts1.z, ts2.z); 
+    float tz_2 = std::max(ts1.z, ts2.z);
+    
+    float t1 = std::max(std::max(tx_1, ty_1), tz_1);
+    float t2 = std::min(std::min(tx_2, ty_2), tz_2);
+    
+    if (t1 > t2 || t2 < 0) {
+        return {};
+    }
+    
+    float t;
+    bool is_inside;
+    if (t1 < 0) {
+        is_inside = true;
+        t = t2;
+    } else {
+        is_inside = false;
+        t = t1;
+    }
+
+    glm::vec3 p = shifted_ray.start + t * shifted_ray.direction;
+    glm::vec3 normal = p / s;
+    float mx = std::max(std::max(std::abs(normal.x), std::abs(normal.y)), std::abs(normal.z));
+
+    if (fabs(normal.x) != mx) {
+        normal.x = 0;
+    }
+    if (fabs(normal.y) != mx) {
+        normal.y = 0;
+    }
+    if (fabs(normal.z) != mx) {
+        normal.z = 0;
+    }
+
+    if (is_inside) {
+        normal = -1.f * normal;
+    }
+
+    Intersection inter{};
+    inter.t = t;
+    inter.normal = glm::normalize(normal);
+    inter.inside = is_inside;
+
+    return inter;
 }
 
 } // namespace engine

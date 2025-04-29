@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <optional>
 #include <vector>
 
 using std::uint32_t;
@@ -13,7 +14,7 @@ BVH::BVH(std::vector<Shape*>& shapes, uint32_t shapes_count) {
     root_idx = build_node(shapes, 0, shapes_count);
 }
 
-shapes_partition_t best_partition(std::vector<Shape*>& shapes, uint32_t first, uint32_t last) {
+static shapes_partition_t best_partition(std::vector<Shape*>& shapes, uint32_t first, uint32_t last) {
     auto count = last - first;
     std::vector<float> prefix_surface_areas(count, 0.f);
     AABB pref_aabb(shapes[first]);
@@ -44,7 +45,7 @@ uint32_t BVH::build_node(std::vector<Shape*>& shapes, uint32_t first, uint32_t l
     Node node{};
     node.first_idx = first;
     node.last_idx = last;
-    
+
     if (first < last) {
         aabb = AABB(shapes[first]);
     }
@@ -79,6 +80,42 @@ uint32_t BVH::build_node(std::vector<Shape*>& shapes, uint32_t first, uint32_t l
     nodes[node_idx].left_child = build_node(shapes, first, best_partition.second);
     nodes[node_idx].right_child = build_node(shapes, best_partition.second, last);    
     return node_idx;
+}
+
+std::optional<std::pair<Intersection, int>> BVH::intersection(const std::vector<Shape*>& shapes, uint32_t node_idx, ray::Ray& ray, std::optional<float> t) const {
+    Node node = nodes[node_idx];
+    auto opt_inter = node.aabb.intersect(ray);
+    if (!opt_inter.has_value()) {
+        return {};
+    }
+    auto inter = opt_inter.value();
+    if (t.has_value() && t.value() < inter.t && !inter.inside) {
+        return {};
+    }
+
+    std::optional<std::pair<Intersection, int>> closest_inter = {};
+    if (node.left_child == 0) {
+        for (uint32_t i = node.first_idx; i < node.last_idx; ++i) {
+            auto cur_inter = shapes[i]->intersection(ray);
+            if (cur_inter.has_value() && (!closest_inter.has_value() || cur_inter.value().t < closest_inter.value().first.t)) {
+                closest_inter = {cur_inter.value(), i};
+            }
+        }
+        return closest_inter;
+    }
+
+    auto left_inter = intersection(shapes, node.left_child, ray, t);
+    closest_inter = left_inter;
+    if (left_inter.has_value() && (!t.has_value() || left_inter.value().first.t < t.value())) {
+        t = left_inter.value().first.t;
+    }
+
+    auto right_inter = intersection(shapes, node.right_child, ray, t);
+    if (right_inter.has_value() && (!t.has_value() || right_inter.value().first.t < closest_inter.value().first.t)) {
+        closest_inter = right_inter;
+    }
+
+    return closest_inter;
 }
 
 } // namespace engine

@@ -17,6 +17,7 @@ struct AABB {
     inline void extend(Ellipsoid* ellips);
     inline void extend(Triangle* triangle);
     float surface_area() const;
+    std::optional<Intersection> intersect(ray::Ray& ray) const;
 
     glm::vec3 min;
     glm::vec3 max;
