@@ -44,11 +44,15 @@ glm::vec3 calc_diffuse_rawcolor(const Scene& scene, Shape* obj, Ray in_ray, cons
     float eps = 1e-4;
     glm::vec3 inter_point = in_ray.start + in_ray.direction * inter.t;
 
-    auto rnd_dir = scene.distribution->sample(inter_point + eps * inter.normal, inter.normal);
-    if (glm::dot(rnd_dir, inter.normal) < 0) {
-        return obj->emission;
-    }
-    float pdf = scene.distribution->pdf(inter_point + eps * inter.normal, inter.normal, rnd_dir);
+    // auto rnd_dir = scene.distribution->sample(inter_point + eps * inter.normal, inter.normal);
+    // if (glm::dot(rnd_dir, inter.normal) < 0) {
+    //     return obj->emission;
+    // }
+    // float pdf = scene.distribution->pdf(inter_point + eps * inter.normal, inter.normal, rnd_dir);
+
+    rand::Cosine cosine_sampler{};
+    glm::vec3 rnd_dir = cosine_sampler.sample({}, inter.normal);
+    float pdf = cosine_sampler.pdf({}, inter.normal, rnd_dir);
 
     Ray out_ray{};
     out_ray.direction = glm::normalize(rnd_dir);

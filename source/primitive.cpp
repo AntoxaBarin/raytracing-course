@@ -145,7 +145,7 @@ std::optional<Intersection> Triangle::intersection(ray::Ray& ray) const {
         vertex_3 - vertex_1, 
         -ray.direction
     };
-    glm::mat3 Minv = glm::inverse(M);
+    glm::mat3 Minv = glm::inverse(glm::transpose(M));
     glm::vec3 uvt = (ray.start - vertex_1) * Minv;
 
     if (uvt.x < 0 || uvt.y < 0 || uvt.x + uvt.y > 1) {
