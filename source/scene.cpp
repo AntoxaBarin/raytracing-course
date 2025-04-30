@@ -1,26 +1,20 @@
 #include "scene.hpp"
+
 #include "distributions.hpp"
 #include "primitive.hpp"
 
-#include <memory>
 #include <stdexcept>
 
 namespace engine {
 
 void Scene::init_light_distrs() {
-    std::vector<std::unique_ptr<rand::IDistribution>> distrs;
-    for (auto& primitive : primitives) {
+    std::vector<Shape*> valid_light_primitives;
+    for (auto primitive : primitives) {
         if (primitive->emission != glm::vec3{0.f, 0.f, 0.f}) {
-            distrs.emplace_back(std::make_unique<rand::Light>(primitive));
+            valid_light_primitives.push_back(primitive);
         }
     }
-    std::vector<std::unique_ptr<rand::IDistribution>> mix_distrs;
-    mix_distrs.emplace_back(std::make_unique<rand::Cosine>());
-
-    if (!distrs.empty()) {
-        mix_distrs.emplace_back(std::make_unique<rand::Mix>(std::move(distrs)));
-    }
-    distribution = new rand::Mix(std::move(mix_distrs));
+    distribution = new rand::Mix(valid_light_primitives);
 }
 
 void Scene::init_bvh() {

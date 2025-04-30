@@ -6,6 +6,7 @@
 
 #include "glm/ext/vector_float3.hpp"
 
+#include "bvh.hpp"
 #include "primitive.hpp"
 
 namespace engine::rand {
@@ -37,7 +38,11 @@ public:
     }
 
     int choice(std::size_t size) {
-        return static_cast<int>(size * uniform_01());
+        auto choice = static_cast<int>(size * uniform_01());
+        if (choice >= size && size != 0) {
+            return choice - 1;
+        }
+        return choice; 
     }
 
 private:
@@ -97,13 +102,19 @@ private:
 
 class Mix : public IDistribution {
 public:
-    Mix(std::vector<std::unique_ptr<IDistribution>>&& distrs);
+    Mix(std::vector<Shape*> shapes);
 
     float pdf(glm::vec3 x, glm::vec3 n, glm::vec3 d) final;
     glm::vec3 sample(glm::vec3 x, glm::vec3 n) final;
 
 private:
-    std::vector<std::unique_ptr<IDistribution>> distrs;
+    float bvh_pdf(std::uint32_t node_idx, glm::vec3 x, glm::vec3 n, glm::vec3 d);
+
+    std::unique_ptr<Cosine> cosine;
+    std::vector<std::unique_ptr<Light>> distrs;
+    BVH bvh;
+    bool only_cosine = false;
 };
+
 
 } // namespace engine::rand

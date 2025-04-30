@@ -1,11 +1,15 @@
 #include "distributions.hpp"
+
 #include "glm/geometric.hpp"
+
 #include "primitive.hpp"
+#include "ray.hpp"
+
+#include <algorithm>
 #include <cstdlib>
 #include <random>
 #include <stdexcept>
 
-#include "ray.hpp"
 
 namespace engine::rand {
 
@@ -70,7 +74,7 @@ float Light::pdf(glm::vec3 x, glm::vec3 n, glm::vec3 d) {
         result += ellips_pdf(x, d, x + inter->t * d, inter->normal);
     }
     else if (obj->type == PRIMITIVE_TYPE::Triangle) {
-        result += triangle_pdf(x, d, x + inter->t * d, inter->normal);
+        return triangle_pdf(x, d, x + inter->t * d, inter->normal);
     }
 
     r.start = x + (inter->t + eps) * d;
@@ -88,6 +92,9 @@ float Light::pdf(glm::vec3 x, glm::vec3 n, glm::vec3 d) {
     }
     else if (obj->type == PRIMITIVE_TYPE::Triangle) {
         result += triangle_pdf(x, d, x + (inter->t + next_inter->t + eps) * d, next_inter->normal);
+    }
+    else {
+        throw std::runtime_error("Cannot calculate pdf for Plane");
     }
     return result;
 }
@@ -225,18 +232,71 @@ glm::vec3 Light::triangle_sample(glm::vec3 x, glm::vec3 n) {
     return glm::normalize(point - x);
 }
 
-Mix::Mix(std::vector<std::unique_ptr<IDistribution>>&& distrs) : distrs(std::move(distrs)) {}
+Mix::Mix(std::vector<Shape*> shapes) {
+    size_t finite_obj_count = std::partition(shapes.begin(), shapes.end(), [](const auto obj) {
+        return obj->type == PRIMITIVE_TYPE::Box || obj->type == PRIMITIVE_TYPE::Ellipsoid || obj->type == PRIMITIVE_TYPE::Triangle;
+    }) - shapes.begin();
+
+    bvh = BVH(shapes, finite_obj_count);
+    cosine = std::make_unique<Cosine>();
+
+    for (int i = 0; i < finite_obj_count; ++i) {
+        Shape* obj = shapes[i];
+        if (obj->type == PRIMITIVE_TYPE::Box) {
+            distrs.push_back(std::make_unique<Light>(obj));
+        } 
+        else if (obj->type == PRIMITIVE_TYPE::Ellipsoid) {
+            distrs.push_back(std::make_unique<Light>(obj));
+        } 
+        else if (obj->type == PRIMITIVE_TYPE::Triangle) {
+            distrs.push_back(std::make_unique<Light>(obj));
+        }
+    }
+
+    if (shapes.size() == 0) {
+        only_cosine = true;
+    }
+}
 
 glm::vec3 Mix::sample(glm::vec3 x, glm::vec3 n) {
+    if (only_cosine) {
+        return cosine->sample(x, n);
+    }   
+    auto coin_toss = Rng::get_instance().uniform_01();
+    if (coin_toss < 0.5f) {
+        return cosine->sample(x, n);
+    }
     return distrs[Rng::get_instance().choice(distrs.size())]->sample(x, n);
 }
 
 float Mix::pdf(glm::vec3 x, glm::vec3 n, glm::vec3 d) {
-    float pdf = 0;
+    float pdf = cosine->pdf(x, n, d);
     for (auto& distr : distrs) {
         pdf += distr->pdf(x, n, d);
     }
-    return pdf / static_cast<float>(distrs.size());
+    return pdf / static_cast<float>(distrs.size() + 1);
+}
+
+
+float Mix::bvh_pdf(std::uint32_t node_idx, glm::vec3 x, glm::vec3 n, glm::vec3 d) {
+    ray::Ray ray;
+    ray.start = x;
+    ray.direction = d;
+    Node node = bvh.nodes[node_idx];
+
+    auto inter = node.aabb.intersect(ray);
+    if (!inter.has_value()) {
+        return 0.f;
+    }
+    if (node.left_child == 0) {
+        float total_pdf = 0.f;
+        for (uint32_t i = node.first_idx; i < node.last_idx; ++i) {
+            total_pdf += distrs[i]->pdf(x, n, d);
+        }
+        return total_pdf;
+    }
+
+    return bvh_pdf(node.left_child, x, n, d) + bvh_pdf(node.right_child, x, n, d);
 }
 
 } // namespace engine::rand
