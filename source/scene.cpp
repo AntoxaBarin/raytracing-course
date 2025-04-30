@@ -20,11 +20,15 @@ void Scene::init_light_distrs() {
 
 void Scene::init_bvh() {
     std::vector<Shape*> shapes;
-    std::copy_if(primitives.begin(), primitives.end(), std::back_inserter(shapes),
-        [](const auto* primitive) {
-            return primitive->type != PRIMITIVE_TYPE::Plane;
-        });
-    bvh = BVH(shapes, shapes.size());
+    auto first_plane_it = std::partition(
+        shapes.begin(), 
+        shapes.end(),
+        [](Shape* obj) { return obj->type != PRIMITIVE_TYPE::Plane; }
+    );
+    
+    first_plane_idx = std::distance(shapes.begin(), first_plane_it);
+    auto non_planes = std::vector<Shape*>(shapes.begin(), first_plane_it);
+    bvh = BVH(non_planes, non_planes.size());
 }
 
 Scene::~Scene() {

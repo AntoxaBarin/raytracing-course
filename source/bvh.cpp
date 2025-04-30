@@ -82,7 +82,7 @@ uint32_t BVH::build_node(std::vector<Shape*>& shapes, uint32_t first, uint32_t l
     return node_idx;
 }
 
-std::optional<std::pair<Intersection, int>> BVH::intersection(const std::vector<Shape*>& shapes, uint32_t node_idx, ray::Ray& ray, std::optional<float> t) const {
+std::optional<std::pair<Intersection, int>> BVH::intersect(const std::vector<Shape*>& shapes, uint32_t node_idx, ray::Ray& ray, std::optional<float> t) const {
     Node node = nodes[node_idx];
     auto opt_inter = node.aabb.intersect(ray);
     if (!opt_inter.has_value()) {
@@ -104,13 +104,13 @@ std::optional<std::pair<Intersection, int>> BVH::intersection(const std::vector<
         return closest_inter;
     }
 
-    auto left_inter = intersection(shapes, node.left_child, ray, t);
+    auto left_inter = intersect(shapes, node.left_child, ray, t);
     closest_inter = left_inter;
     if (left_inter.has_value() && (!t.has_value() || left_inter.value().first.t < t.value())) {
         t = left_inter.value().first.t;
     }
 
-    auto right_inter = intersection(shapes, node.right_child, ray, t);
+    auto right_inter = intersect(shapes, node.right_child, ray, t);
     if (right_inter.has_value() && (!t.has_value() || right_inter.value().first.t < closest_inter.value().first.t)) {
         closest_inter = right_inter;
     }

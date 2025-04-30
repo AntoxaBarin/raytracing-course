@@ -30,6 +30,7 @@ struct Scene {
     std::uint32_t samples;
     std::vector<Shape*> primitives;
     rand::Mix* distribution;
+    std::uint32_t first_plane_idx;
     BVH bvh;
 
     void init_light_distrs();

@@ -5,6 +5,7 @@
 #include "distributions.hpp"
 
 #include <cmath>
+#include <cstdint>
 #include <optional>
 #include <stdexcept>
 
@@ -134,17 +135,25 @@ std::pair<std::optional<float>, glm::vec3> raytrace(Ray& ray, const Scene& scene
         return {inter_t, color};
     }
 
-    for (auto primitive : scene.primitives) {
-        auto cur_inter = intersection(ray, primitive);
+    for (uint32_t i = scene.first_plane_idx; i < scene.primitives.size(); ++i) {
+        auto cur_inter = intersection(ray, scene.primitives[i]);
         if (!cur_inter.has_value()) {
             continue;
         }
         if (!inter_t.has_value() || inter_t.value() > cur_inter->t) {
             inter_t = cur_inter->t;
             closest_inter = cur_inter;
-            closest_primitive = primitive;
+            closest_primitive = scene.primitives[i];
         }
     }
+
+    auto bvh_inter = scene.bvh.intersect(scene.primitives, scene.bvh.root_idx, ray, inter_t);
+    if (bvh_inter.has_value() && (!closest_inter.has_value() || bvh_inter.value().first.t < closest_inter->t)) {
+        inter_t = bvh_inter.value().first.t;
+        closest_inter = bvh_inter.value().first;
+        closest_primitive = scene.primitives[bvh_inter.value().second];
+    }
+
     if (closest_inter.has_value()) {
         color = calc_color(scene, closest_primitive, ray, closest_inter.value(), ray_depth);
     }
