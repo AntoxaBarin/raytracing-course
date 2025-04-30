@@ -3,6 +3,7 @@
 #include "distributions.hpp"
 #include "primitive.hpp"
 
+#include <algorithm>
 #include <stdexcept>
 
 namespace engine {
@@ -19,11 +20,10 @@ void Scene::init_light_distrs() {
 
 void Scene::init_bvh() {
     std::vector<Shape*> shapes;
-    for (auto primitive : primitives) {
-        if (primitive->type != PRIMITIVE_TYPE::Plane) {
-            shapes.push_back(primitive);
-        }
-    }
+    std::copy_if(primitives.begin(), primitives.end(), std::back_inserter(shapes),
+        [](const auto* primitive) {
+            return primitive->type != PRIMITIVE_TYPE::Plane;
+        });
     bvh = BVH(shapes, shapes.size());
 }
 

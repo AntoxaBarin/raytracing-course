@@ -107,6 +107,7 @@ Scene load_scene(const std::string& path) {
             ss >> scene.primitives.back()->ior;
         }
     }
+    scene.init_bvh();
     scene.init_light_distrs();
     return scene;
 }
